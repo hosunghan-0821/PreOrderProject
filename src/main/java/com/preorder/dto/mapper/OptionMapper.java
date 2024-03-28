@@ -10,7 +10,12 @@ import org.mapstruct.Mapper;
 public interface OptionMapper {
 
     OptionDomainDto changeToOptionDomainDto(OptionViewDto optionViewDto);
+    OptionDomainDto changeToOptionDomainDto(Option option);
 
     Option changeToOption(OptionDomainDto optionDomainDto);
+
+    OptionViewDto changeToOptionViewDto(OptionDomainDto optionDomainDto);
+
+
 
 }

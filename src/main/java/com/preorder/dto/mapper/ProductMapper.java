@@ -14,5 +14,6 @@ public interface ProductMapper {
     ProductDomainDto changeToProductDomainDto(ProductViewDto productViewDto);
     Product changeToProduct(ProductDomainDto productDomainDto);
 
-
+    ProductViewDto changeToProductViewDto(ProductDomainDto productDomainDto);
+    ProductDomainDto changeToProductDomainDto(Product product);
 }

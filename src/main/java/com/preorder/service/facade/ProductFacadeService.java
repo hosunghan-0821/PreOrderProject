@@ -11,12 +11,15 @@ import com.preorder.dto.viewdto.ProductViewDto;
 import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,13 +62,36 @@ public class ProductFacadeService {
 
         //image 저장 나중에
 
-
         return true;
     }
 
-    public List<ProductViewDto> getProductDto(Pageable pageable) {
+    public Page<ProductViewDto> getProductList(Pageable pageable) {
 
         assert (pageable != null);
-        return null;
+
+        Page<ProductDomainDto> productList = productService.getProductList(pageable);
+        List<ProductViewDto> productViewDtoList = productList.stream().map(productMapper::changeToProductViewDto).collect(Collectors.toList());
+
+        return new PageImpl<>(productViewDtoList, pageable, productList.getTotalElements());
+    }
+
+    public ProductViewDto getProductDetail(Long id) {
+
+        assert (id != null && id > 0);
+
+        ProductDomainDto productDomainDto = productService.getProductById(id);
+
+        ProductViewDto productViewDto = productMapper.changeToProductViewDto(productDomainDto);
+        assert (productDomainDto != null);
+
+        List<OptionDomainDto> optionByProduct = optionService.findOptionByProduct(id);
+
+        List<OptionViewDto> optionViewDtoList = optionByProduct.stream()
+                .map(optionMapper::changeToOptionViewDto)
+                .collect(Collectors.toList());
+
+        productViewDto.setOptionViewDtoList(optionViewDtoList);
+
+        return productViewDto;
     }
 }

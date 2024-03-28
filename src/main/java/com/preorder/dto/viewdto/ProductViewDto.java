@@ -36,4 +36,7 @@ public class ProductViewDto {
     @Valid
     private List<OptionViewDto> options;
 
+    public void setOptionViewDtoList(List<OptionViewDto> optionViewDtoList) {
+        this.options = optionViewDtoList;
+    }
 }

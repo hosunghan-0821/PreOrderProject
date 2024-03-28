@@ -4,13 +4,12 @@ package com.preorder.controller;
 import com.preorder.dto.viewdto.ProductViewDto;
 import com.preorder.service.facade.ProductFacadeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.preorder.global.validation.ValidationMarker.OnCreate;
 
@@ -21,14 +20,33 @@ public class ProductController {
 
 
     private final ProductFacadeService productFacadeService;
-    @PostMapping("/product")
-    public ResponseEntity<?> registerProduct(@Validated({OnCreate.class})  // 경계 값 검증
-                                                 @RequestBody ProductViewDto productViewDto) {
+
+    @PostMapping("/products")
+    public ResponseEntity<Boolean> registerProduct(@Validated({OnCreate.class})  // 경계 값 검증
+                                                   @RequestBody ProductViewDto productViewDto) {
 
         assert (productViewDto != null);
 
         productFacadeService.registerProduct(productViewDto);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<Page<ProductViewDto>> getProductList(Pageable pageable) {
+
+        assert (pageable != null);
+
+        return new ResponseEntity<>(productFacadeService.getProductList(pageable), HttpStatus.OK);
+
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<ProductViewDto> getProductDetail(@PathVariable(value = "id") Long id) {
+
+        assert (id != null && id > 0);
+        ProductViewDto productDetail = productFacadeService.getProductDetail(id);
+
+        return new ResponseEntity<>(productDetail,HttpStatus.OK);
     }
 }
