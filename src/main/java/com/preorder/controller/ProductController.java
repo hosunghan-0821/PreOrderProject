@@ -2,7 +2,7 @@ package com.preorder.controller;
 
 
 import com.preorder.dto.viewdto.ProductViewDto;
-import com.preorder.service.product.ProductFacadeService;
+import com.preorder.service.facade.ProductFacadeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

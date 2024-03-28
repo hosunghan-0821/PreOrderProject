@@ -18,4 +18,6 @@ public class OptionDomainDto {
     private int price;
 
     private String category;
+
+    private ProductDomainDto productDomainDto;
 }
