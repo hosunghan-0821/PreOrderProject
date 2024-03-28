@@ -13,7 +13,7 @@ import javax.persistence.Id;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product extends BaseEntity{
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +21,14 @@ public class Product extends BaseEntity{
 
     private String name;
 
-    private String Category;
+    private String category;
 
     private int price;
 
+
+    public void updateData(String name, String category, int price) {
+        this.name = name;
+        this.category = category;
+        this.price =price;
+    }
 }

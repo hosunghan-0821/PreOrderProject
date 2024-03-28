@@ -18,6 +18,7 @@ public class OptionService {
     private final OptionRepository optionRepository;
 
     private final OptionMapper optionMapper;
+
     public Option register(OptionDomainDto optionDomainDto, Product registeredProduct) {
 
         assert (optionDomainDto != null);
@@ -36,6 +37,16 @@ public class OptionService {
         List<Option> optionList = optionRepository.findAllByProductIdOrderById(productById);
 
         return optionList.stream().map(optionMapper::changeToOptionDomainDto).collect(Collectors.toList());
+
+    }
+
+    public void deleteAllOption(Long id) {
+
+        assert (id != null);
+
+        List<Option> optionList = optionRepository.findAllByProductIdOrderById(id);
+        optionRepository.deleteAllById(optionList.stream().map(Option::getId).collect(Collectors.toList()));
+
 
     }
 }

@@ -41,4 +41,24 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow(IllegalArgumentException::new);
         return mapper.changeToProductDomainDto(product);
     }
+
+    public Product updateProduct(ProductDomainDto productDomainDto) {
+        assert (productDomainDto != null);
+        assert (productDomainDto.getId() != null);
+
+        Product product = productRepository.findById(productDomainDto.getId()).orElseThrow(IllegalArgumentException::new);
+
+        product.updateData(productDomainDto.getName(), product.getCategory(), product.getPrice());
+
+        return product;
+    }
+
+
+    public void deleteProduct(Long id) {
+        assert (id != null && id > 0);
+
+        productRepository.deleteById(id);
+
+
+    }
 }

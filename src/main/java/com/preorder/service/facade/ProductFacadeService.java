@@ -34,7 +34,7 @@ public class ProductFacadeService {
     private final OptionMapper optionMapper;
 
     @Transactional
-    public boolean registerProduct(ProductViewDto productViewDto) {
+    public void registerProduct(ProductViewDto productViewDto) {
 
         assert (productViewDto != null);
 
@@ -61,10 +61,9 @@ public class ProductFacadeService {
         }
 
         //image 저장 나중에
-
-        return true;
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductViewDto> getProductList(Pageable pageable) {
 
         assert (pageable != null);
@@ -75,13 +74,14 @@ public class ProductFacadeService {
         return new PageImpl<>(productViewDtoList, pageable, productList.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     public ProductViewDto getProductDetail(Long id) {
 
         assert (id != null && id > 0);
 
         ProductDomainDto productDomainDto = productService.getProductById(id);
-
         ProductViewDto productViewDto = productMapper.changeToProductViewDto(productDomainDto);
+
         assert (productDomainDto != null);
 
         List<OptionDomainDto> optionByProduct = optionService.findOptionByProduct(id);
@@ -93,5 +93,37 @@ public class ProductFacadeService {
         productViewDto.setOptionViewDtoList(optionViewDtoList);
 
         return productViewDto;
+    }
+
+    @Transactional
+    public void updateProduct(ProductViewDto productViewDto) {
+        assert (productViewDto != null);
+        assert (productViewDto.getId() != null);
+
+        ProductDomainDto productDomainDto = productMapper.changeToProductDomainDto(productViewDto);
+        Product updateProduct = productService.updateProduct(productDomainDto);
+
+        List<OptionDomainDto> optionDomainDtoList = new ArrayList<>();
+
+        for (OptionViewDto optionViewDto : productViewDto.getOptions()) {
+            optionDomainDtoList.add(optionMapper.changeToOptionDomainDto(optionViewDto));
+        }
+
+        //제거 후 옵션 재생성
+        optionService.deleteAllOption(updateProduct.getId());
+
+        for (OptionDomainDto optionDomainDto : optionDomainDtoList) {
+            optionService.register(optionDomainDto, updateProduct);
+        }
+
+    }
+
+    public void deleteProduct(Long id) {
+        assert (id != null && id > 0);
+
+        //순서중요
+        optionService.deleteAllOption(id);
+        productService.deleteProduct(id);
+
     }
 }

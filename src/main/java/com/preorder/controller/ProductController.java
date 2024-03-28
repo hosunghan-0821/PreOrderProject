@@ -2,6 +2,7 @@ package com.preorder.controller;
 
 
 import com.preorder.dto.viewdto.ProductViewDto;
+import com.preorder.global.validation.ValidationMarker;
 import com.preorder.service.facade.ProductFacadeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,6 +48,25 @@ public class ProductController {
         assert (id != null && id > 0);
         ProductViewDto productDetail = productFacadeService.getProductDetail(id);
 
-        return new ResponseEntity<>(productDetail,HttpStatus.OK);
+        return new ResponseEntity<>(productDetail, HttpStatus.OK);
     }
+
+    @PutMapping("/products/{id}")
+    public ResponseEntity<Boolean> updateProduct(@Validated({ValidationMarker.OnUpdate.class})  // 경계 값 검증
+                                                 @RequestBody ProductViewDto productViewDto) {
+
+        assert (productViewDto != null);
+
+        productFacadeService.updateProduct(productViewDto);
+
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Boolean> deleteProduct(@PathVariable(value = "id") Long id) {
+        productFacadeService.deleteProduct(id);
+
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
 }
