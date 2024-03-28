@@ -1,7 +1,17 @@
+buildscript {
+	dependencies {
+		classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10")
+	}
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.6.0'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.preorder'
@@ -42,9 +52,38 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	//postgresql
-	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
-	runtimeOnly 'org.postgresql:postgresql' // 추가
+	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	//QueryDSL
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
 }
+
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
+
+
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+
 
 configurations {
 	compileOnly{
