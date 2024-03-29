@@ -8,6 +8,7 @@ import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OptionViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
+import com.preorder.global.util.ProductExcelReader;
 import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,8 @@ public class ProductFacadeService {
     private final ProductMapper productMapper;
 
     private final OptionMapper optionMapper;
+
+    private final ProductExcelReader productExcelReader;
 
     @Transactional
     public void registerProduct(ProductViewDto productViewDto) {
@@ -126,4 +130,15 @@ public class ProductFacadeService {
         productService.deleteProduct(id);
 
     }
+
+    @Transactional
+    public void bulkRegisterProduct(MultipartFile file) {
+
+        List<ProductDomainDto> productDomainDtoList = productExcelReader.getProductListFromExcel(file);
+        productService.bulkRegisterProduct(productDomainDtoList);
+
+    }
+
+
+
 }

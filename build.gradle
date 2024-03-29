@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
 
+
 	//Spring Basic
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -40,6 +41,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	//QueryDSL
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 
 	//MapStruct
@@ -55,14 +60,27 @@ dependencies {
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
 	runtimeOnly 'org.postgresql:postgresql'
 
-	//QueryDSL
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+	//excel reader poi
+	implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 
 }
 
-apply plugin: "com.ewerk.gradle.plugins.querydsl"
+jar {
+	enabled = false
+}
 
+
+
+
+configurations {
+	compileOnly{
+		extendsFrom annotationProcessor
+	}
+}
+
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 def querydslDir = "$buildDir/generated/querydsl"
 
@@ -73,6 +91,7 @@ querydsl {
 sourceSets {
 	main.java.srcDir querydslDir
 }
+
 compileQuerydsl{
 	options.annotationProcessorPath = configurations.querydsl
 }
@@ -82,13 +101,6 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 	querydsl.extendsFrom compileClasspath
-}
-
-
-configurations {
-	compileOnly{
-		extendsFrom annotationProcessor
-	}
 }
 
 tasks.named('test') {

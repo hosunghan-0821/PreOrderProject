@@ -5,19 +5,19 @@ import com.preorder.domain.Product;
 import com.preorder.dto.domaindto.ProductDomainDto;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.repository.ProductRepository;
-import com.preorder.repository.ProductRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
-
-    private final ProductRepositoryCustom productRepositoryCustom;
 
     private final ProductMapper mapper;
 
@@ -33,7 +33,7 @@ public class ProductService {
 
     public Page<ProductDomainDto> getProductList(Pageable pageable) {
 
-        return productRepositoryCustom.getProductList(pageable);
+        return productRepository.getProductList(pageable);
     }
 
     public ProductDomainDto getProductById(Long id) {
@@ -59,6 +59,12 @@ public class ProductService {
 
         productRepository.deleteById(id);
 
+    }
+
+    public void bulkRegisterProduct(List<ProductDomainDto> productDomainDtoList) {
+
+        List<Product> productList = productDomainDtoList.stream().map(mapper::changeToProduct).collect(Collectors.toList());
+        productRepository.bulkInsertProducts(productList);
 
     }
 }

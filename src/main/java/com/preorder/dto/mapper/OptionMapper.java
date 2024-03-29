@@ -5,8 +5,9 @@ import com.preorder.domain.Option;
 import com.preorder.dto.domaindto.OptionDomainDto;
 import com.preorder.dto.viewdto.OptionViewDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface OptionMapper {
 
     OptionDomainDto changeToOptionDomainDto(OptionViewDto optionViewDto);

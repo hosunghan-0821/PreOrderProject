@@ -9,8 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,11 +22,13 @@ import static com.preorder.domain.QProduct.product;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
+public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
 
     private final JPAQueryFactory jpaQueryFactory;
 
     private final ProductMapper productMapper;
+
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Page<ProductDomainDto> getProductList(Pageable pageable) {
@@ -43,6 +49,33 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(productDomainDtoList, pageable, totalCounts);
+
+    }
+
+    @Override
+    public void bulkInsertProducts(List<Product> productList) {
+
+
+        String sql = "INSERT INTO product " +
+                "(name,price,category,is_deleted) VALUES (?,?,?,?)";
+
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Product product = productList.get(i);
+
+                ps.setString(1, product.getName());
+                ps.setInt(2, product.getPrice());
+                ps.setString(3, product.getCategory());
+                ps.setBoolean(4, false);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return productList.size();
+            }
+        });
+
 
     }
 }
