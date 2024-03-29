@@ -2,8 +2,8 @@ package com.preorder.service.facade;
 
 
 import com.preorder.domain.Product;
-import com.preorder.dto.domaindto.OptionDomainDto;
-import com.preorder.dto.domaindto.ProductDomainDto;
+import com.preorder.dto.domaindto.OptionDto;
+import com.preorder.dto.domaindto.ProductDto;
 import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OptionViewDto;
@@ -44,24 +44,24 @@ public class ProductFacadeService {
 
         // productViewDto -> productDomainDto 후 등록
         // To-DO 전환 잘 되는지 TestCode 작성
-        ProductDomainDto productDomainDto = productMapper.changeToProductDomainDto(productViewDto);
+        ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);
 
-        assert (productDomainDto != null);
+        assert (productDto != null);
 
         //productDomainDto -> product save
-        Product registeredProduct = productService.register(productDomainDto);
+        Product registeredProduct = productService.register(productDto);
         assert (registeredProduct != null);
 
         // productViewDto -> OptionDomainDto 후 등록
         // To-DO 전환 잘 되는지 TestCode 작성
-        List<OptionDomainDto> optionDomainDtoList = new ArrayList<>();
+        List<OptionDto> optionDtoList = new ArrayList<>();
 
         for (OptionViewDto optionViewDto : productViewDto.getOptions()) {
-            optionDomainDtoList.add(optionMapper.changeToOptionDomainDto(optionViewDto));
+            optionDtoList.add(optionMapper.changeToOptionDomainDto(optionViewDto));
         }
 
-        for (OptionDomainDto optionDomainDto : optionDomainDtoList) {
-            optionService.register(optionDomainDto, registeredProduct);
+        for (OptionDto optionDto : optionDtoList) {
+            optionService.register(optionDto, registeredProduct);
         }
 
         //image 저장 나중에
@@ -72,7 +72,7 @@ public class ProductFacadeService {
 
         assert (pageable != null);
 
-        Page<ProductDomainDto> productList = productService.getProductList(pageable);
+        Page<ProductDto> productList = productService.getProductList(pageable);
         List<ProductViewDto> productViewDtoList = productList.stream().map(productMapper::changeToProductViewDto).collect(Collectors.toList());
 
         return new PageImpl<>(productViewDtoList, pageable, productList.getTotalElements());
@@ -83,12 +83,12 @@ public class ProductFacadeService {
 
         assert (id != null && id > 0);
 
-        ProductDomainDto productDomainDto = productService.getProductById(id);
-        ProductViewDto productViewDto = productMapper.changeToProductViewDto(productDomainDto);
+        ProductDto productDto = productService.getProductById(id);
+        ProductViewDto productViewDto = productMapper.changeToProductViewDto(productDto);
 
-        assert (productDomainDto != null);
+        assert (productDto != null);
 
-        List<OptionDomainDto> optionByProduct = optionService.findOptionByProduct(id);
+        List<OptionDto> optionByProduct = optionService.findOptionByProduct(id);
 
         List<OptionViewDto> optionViewDtoList = optionByProduct.stream()
                 .map(optionMapper::changeToOptionViewDto)
@@ -104,20 +104,20 @@ public class ProductFacadeService {
         assert (productViewDto != null);
         assert (productViewDto.getId() != null);
 
-        ProductDomainDto productDomainDto = productMapper.changeToProductDomainDto(productViewDto);
-        Product updateProduct = productService.updateProduct(productDomainDto);
+        ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);
+        Product updateProduct = productService.updateProduct(productDto);
 
-        List<OptionDomainDto> optionDomainDtoList = new ArrayList<>();
+        List<OptionDto> optionDtoList = new ArrayList<>();
 
         for (OptionViewDto optionViewDto : productViewDto.getOptions()) {
-            optionDomainDtoList.add(optionMapper.changeToOptionDomainDto(optionViewDto));
+            optionDtoList.add(optionMapper.changeToOptionDomainDto(optionViewDto));
         }
 
         //제거 후 옵션 재생성
         optionService.deleteAllOption(updateProduct.getId());
 
-        for (OptionDomainDto optionDomainDto : optionDomainDtoList) {
-            optionService.register(optionDomainDto, updateProduct);
+        for (OptionDto optionDto : optionDtoList) {
+            optionService.register(optionDto, updateProduct);
         }
 
     }
@@ -134,8 +134,8 @@ public class ProductFacadeService {
     @Transactional
     public void bulkRegisterProduct(MultipartFile file) {
 
-        List<ProductDomainDto> productDomainDtoList = productExcelReader.getProductListFromExcel(file);
-        productService.bulkRegisterProduct(productDomainDtoList);
+        List<ProductDto> productDtoList = productExcelReader.getProductListFromExcel(file);
+        productService.bulkRegisterProduct(productDtoList);
 
     }
 

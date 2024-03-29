@@ -2,7 +2,7 @@ package com.preorder.dto.mapper;
 
 
 import com.preorder.domain.Product;
-import com.preorder.dto.domaindto.ProductDomainDto;
+import com.preorder.dto.domaindto.ProductDto;
 import com.preorder.dto.viewdto.ProductViewDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -11,9 +11,9 @@ import org.mapstruct.ReportingPolicy;
 public interface ProductMapper {
 
 
-    ProductDomainDto changeToProductDomainDto(ProductViewDto productViewDto);
-    Product changeToProduct(ProductDomainDto productDomainDto);
+    ProductDto changeToProductDomainDto(ProductViewDto productViewDto);
+    Product changeToProduct(ProductDto productDto);
 
-    ProductViewDto changeToProductViewDto(ProductDomainDto productDomainDto);
-    ProductDomainDto changeToProductDomainDto(Product product);
+    ProductViewDto changeToProductViewDto(ProductDto productDto);
+    ProductDto changeToProductDomainDto(Product product);
 }

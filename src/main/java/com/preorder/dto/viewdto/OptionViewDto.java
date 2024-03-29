@@ -1,5 +1,6 @@
 package com.preorder.dto.viewdto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.preorder.global.validation.ValidationMarker;
 import lombok.*;
 
@@ -23,5 +24,11 @@ public class OptionViewDto {
     private int fee;
 
     private String type;
+
+    //Domain : OptionDetail 항목
+    @JsonProperty("optionDetailId")
+    private Long optionDetailId;
+    @JsonProperty("optionValue")
+    private String optionValue;
 
 }

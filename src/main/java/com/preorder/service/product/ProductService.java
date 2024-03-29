@@ -2,7 +2,7 @@ package com.preorder.service.product;
 
 
 import com.preorder.domain.Product;
-import com.preorder.dto.domaindto.ProductDomainDto;
+import com.preorder.dto.domaindto.ProductDto;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,34 +21,34 @@ public class ProductService {
 
     private final ProductMapper mapper;
 
-    public Product register(ProductDomainDto productDomainDto) {
+    public Product register(ProductDto productDto) {
 
-        assert (productDomainDto != null);
+        assert (productDto != null);
 
-        Product product = mapper.changeToProduct(productDomainDto);
+        Product product = mapper.changeToProduct(productDto);
 
         return productRepository.save(product);
 
     }
 
-    public Page<ProductDomainDto> getProductList(Pageable pageable) {
+    public Page<ProductDto> getProductList(Pageable pageable) {
 
         return productRepository.getProductList(pageable);
     }
 
-    public ProductDomainDto getProductById(Long id) {
+    public ProductDto getProductById(Long id) {
         assert (id != null && id > 0);
         Product product = productRepository.findById(id).orElseThrow(IllegalArgumentException::new);
         return mapper.changeToProductDomainDto(product);
     }
 
-    public Product updateProduct(ProductDomainDto productDomainDto) {
-        assert (productDomainDto != null);
-        assert (productDomainDto.getId() != null);
+    public Product updateProduct(ProductDto productDto) {
+        assert (productDto != null);
+        assert (productDto.getId() != null);
 
-        Product product = productRepository.findById(productDomainDto.getId()).orElseThrow(IllegalArgumentException::new);
+        Product product = productRepository.findById(productDto.getId()).orElseThrow(IllegalArgumentException::new);
 
-        product.updateData(productDomainDto.getName(), product.getCategory(), product.getPrice());
+        product.updateData(productDto.getName(), product.getCategory(), product.getPrice());
 
         return product;
     }
@@ -61,10 +61,20 @@ public class ProductService {
 
     }
 
-    public void bulkRegisterProduct(List<ProductDomainDto> productDomainDtoList) {
+    public void bulkRegisterProduct(List<ProductDto> productDtoList) {
 
-        List<Product> productList = productDomainDtoList.stream().map(mapper::changeToProduct).collect(Collectors.toList());
+        List<Product> productList = productDtoList.stream().map(mapper::changeToProduct).collect(Collectors.toList());
         productRepository.bulkInsertProducts(productList);
+
+    }
+
+    public Product isExistProduct(Long productId) {
+
+        assert (productId != null);
+        assert (productId > 0);
+
+        return productRepository.findById(productId)
+                .orElseThrow(RuntimeException::new); // 오류처리 변경해야함
 
     }
 }

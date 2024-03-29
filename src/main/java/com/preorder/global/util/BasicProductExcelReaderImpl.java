@@ -1,6 +1,6 @@
 package com.preorder.global.util;
 
-import com.preorder.dto.domaindto.ProductDomainDto;
+import com.preorder.dto.domaindto.ProductDto;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +14,10 @@ import java.util.List;
 @Component
 public class BasicProductExcelReaderImpl implements ProductExcelReader {
     @Override
-    public List<ProductDomainDto> getProductListFromExcel(MultipartFile file) {
+    public List<ProductDto> getProductListFromExcel(MultipartFile file) {
 
         assert (file != null);
-        List<ProductDomainDto> productDomainDtoList = new ArrayList<>();
+        List<ProductDto> productDtoList = new ArrayList<>();
         try (
                 InputStream inputStream = file.getInputStream();
                 Workbook workbook = WorkbookFactory.create(inputStream);
@@ -33,12 +33,12 @@ public class BasicProductExcelReaderImpl implements ProductExcelReader {
                 if (getCellValue(row.getCell(0)).isEmpty()) {
                     break;
                 }
-                ProductDomainDto productDomainDto = ProductDomainDto.builder()
+                ProductDto productDto = ProductDto.builder()
                         .name(row.getCell(0).getStringCellValue())
                         .category(row.getCell(1).getStringCellValue())
                         .price((int) row.getCell(2).getNumericCellValue())
                         .build();
-                productDomainDtoList.add(productDomainDto);
+                productDtoList.add(productDto);
             }
 
 
@@ -46,7 +46,7 @@ public class BasicProductExcelReaderImpl implements ProductExcelReader {
            throw new IllegalArgumentException(e.getMessage());
         }
 
-        return productDomainDtoList;
+        return productDtoList;
     }
 
     private static String getCellValue(Cell cell) {
