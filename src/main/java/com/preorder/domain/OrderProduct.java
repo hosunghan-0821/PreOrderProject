@@ -1,8 +1,10 @@
 package com.preorder.domain;
 
+
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -10,25 +12,21 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_option")
-public class Option extends BaseEntity{
+@Table(name = "tb_order_product")
+public class OrderProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Order order;
 
-    private int fee;
-
-    private String optionType;
-
-    private String description;
-
+    @JoinColumn(name = "product_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
-    public void registerProduct(Product product) {
-        this.product = product;
-    }
+    @OneToMany(mappedBy = "orderProduct")
+    private List<OptionDetail> optionDetails;
 }

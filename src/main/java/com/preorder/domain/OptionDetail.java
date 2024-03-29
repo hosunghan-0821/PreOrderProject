@@ -10,15 +10,21 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_image")
-public class Image extends BaseEntity{
+@Table(name = "tb_option_detail")
+public class OptionDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageSrc;
-
+    @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
-    private Product product;
+    private Option option;
+
+    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    private OrderProduct orderProduct;
+
+    private String optionValue;
+
 }

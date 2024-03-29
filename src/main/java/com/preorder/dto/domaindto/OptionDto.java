@@ -9,14 +9,15 @@ import lombok.*;
 @Setter(AccessLevel.PROTECTED)
 @Builder
 @ToString
-public class ProductDomainDto {
+public class OptionDto {
 
     private Long id;
 
     private String name;
 
-    private int price;
+    private int fee;
 
     private String category;
 
+    private ProductDto productDto;
 }

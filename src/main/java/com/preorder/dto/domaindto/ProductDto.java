@@ -9,7 +9,7 @@ import lombok.*;
 @Setter(AccessLevel.PROTECTED)
 @Builder
 @ToString
-public class OptionDomainDto {
+public class ProductDto {
 
     private Long id;
 
@@ -19,5 +19,4 @@ public class OptionDomainDto {
 
     private String category;
 
-    private ProductDomainDto productDomainDto;
 }
