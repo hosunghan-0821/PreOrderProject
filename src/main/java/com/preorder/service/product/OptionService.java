@@ -73,4 +73,13 @@ public class OptionService {
 
         optionDetailRepository.save(optionDetail);
     }
+    public boolean matchProductAndOption(Option option, Long productId) {
+        assert (option != null && option.getId() != null);
+
+        if(option.getProduct().getId().equals(productId)){
+            return  true;
+        }
+        return  false;
+    }
+
 }

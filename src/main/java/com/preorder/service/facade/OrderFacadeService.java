@@ -17,10 +17,12 @@ import com.preorder.service.order.OrderService;
 import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OrderFacadeService {
 
@@ -55,10 +57,10 @@ public class OrderFacadeService {
             ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);
 
             assert (productDto != null);
-            Product existProduct = productService.isExistProduct(productDto.getId());
+            Product product = productService.isExistProduct(productDto.getId());
 
 
-            OrderProduct orderProduct = orderService.registerOrderProduct(savedOrder, existProduct);
+            OrderProduct orderProduct = orderService.registerOrderProduct(savedOrder, product);
 
             //주문 옵션 저장
             for (OptionViewDto optionViewDto : productViewDto.getOptions()) {
@@ -69,6 +71,12 @@ public class OrderFacadeService {
 
                 Option option = optionService.isExistOption(optionDto.getId());
 
+                assert (option.getProduct() != null);
+                boolean isMatch = optionService.matchProductAndOption(option, product.getId());
+                if (!isMatch){
+                    log.error("option and product does not match option registered Fail");
+                    continue;
+                }
                 optionService.saveOptionDetail(orderProduct, option, optionViewDto.getOptionValue());
 
             }
