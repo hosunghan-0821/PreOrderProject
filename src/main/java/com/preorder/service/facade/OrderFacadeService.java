@@ -59,6 +59,13 @@ public class OrderFacadeService {
         assert (orderViewDto != null);
 
         //시간 요구조건 확인
+        assert (orderViewDto.getReservationDate() != null);
+
+        if (!orderService.checkReservationDate(orderViewDto.getReservationDate())) {
+            log.error("reservation Date validation false");
+            throw new RuntimeException(""); // TO-DO 오류처리 및 로그
+        }
+
 
 
         //주문기본 내용 저장
@@ -115,7 +122,7 @@ public class OrderFacadeService {
         final OrderDto orderDomainDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
         List<OrderProduct> orderProductList = orderService.getOrder(orderDomainDto);
 
-        assert(!orderProductList.isEmpty());
+        assert (!orderProductList.isEmpty());
 
         orderViewDto = orderMapper.toOrderViewDto(orderProductList.get(0).getOrder());
 
