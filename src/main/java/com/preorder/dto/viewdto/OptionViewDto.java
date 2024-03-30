@@ -31,4 +31,8 @@ public class OptionViewDto {
     @JsonProperty("optionValue")
     private String optionValue;
 
+    public void setDetailValue(Long id, String optionValue) {
+        this.optionDetailId = id;
+        this.optionValue = optionValue;
+    }
 }

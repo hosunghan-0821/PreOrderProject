@@ -17,6 +17,6 @@ public interface OptionMapper {
 
     OptionViewDto changeToOptionViewDto(OptionDto optionDto);
 
-
+    OptionViewDto changeToOptionViewDto(Option option);
 
 }

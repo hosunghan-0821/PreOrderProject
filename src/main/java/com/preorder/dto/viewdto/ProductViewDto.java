@@ -12,6 +12,7 @@ import java.util.List;
 
 import static com.preorder.global.error.ErrorMessage.NOT_NULL;
 import static com.preorder.global.error.ErrorMessage.NULL;
+import static com.preorder.global.validation.ValidationMarker.OnRegisterOrder;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +23,10 @@ public class ProductViewDto {
 
     @Null(groups = {OnCreate.class}, message = NULL)
     @NotNull(groups = {OnUpdate.class}, message = NOT_NULL)
+    @NotNull(groups = {OnRegisterOrder.class})
     private Long id;
 
+    @NotNull(groups = {OnRegisterOrder.class})
     private String name;
 
     private int price;

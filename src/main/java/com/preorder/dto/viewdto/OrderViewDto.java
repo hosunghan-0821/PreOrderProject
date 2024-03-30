@@ -40,4 +40,8 @@ public class OrderViewDto {
     @NotEmpty
     @JsonProperty("products")
     public List<ProductViewDto> products;
+
+    public void setProductViewDtoList(List<ProductViewDto> productViewDtoList) {
+        this.products = productViewDtoList;
+    }
 }

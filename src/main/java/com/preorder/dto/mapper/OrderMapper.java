@@ -9,7 +9,13 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface OrderMapper {
-    OrderDto toOrderDomainDto(OrderViewDto orderViewDto);
+    OrderDto changeTOoOrderDomainDto(OrderViewDto orderViewDto);
 
-    Order toOrder(OrderDto orderDto);
+    Order changeToOrder(OrderDto orderDto);
+
+    OrderDto changeToOrderDto(Order order);
+
+    OrderViewDto toOrderViewDto(Order order);
+
+    OrderViewDto toOrderViewDto(OrderDto orderDto);
 }

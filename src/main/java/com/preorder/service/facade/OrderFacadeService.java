@@ -1,9 +1,6 @@
 package com.preorder.service.facade;
 
-import com.preorder.domain.Option;
-import com.preorder.domain.Order;
-import com.preorder.domain.OrderProduct;
-import com.preorder.domain.Product;
+import com.preorder.domain.*;
 import com.preorder.dto.domaindto.OptionDto;
 import com.preorder.dto.domaindto.OrderDto;
 import com.preorder.dto.domaindto.ProductDto;
@@ -13,13 +10,25 @@ import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OptionViewDto;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
+import com.preorder.infra.discord.DiscordBot;
+import com.preorder.infra.sms.SMSMessageDto;
+import com.preorder.infra.sms.SMSMessageType;
+import com.preorder.infra.sms.SMSService;
 import com.preorder.service.order.OrderService;
 import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -40,6 +49,10 @@ public class OrderFacadeService {
 
     private final ProductService productService;
 
+    private final SMSService smsService;
+
+    private final DiscordBot discordBot;
+
     @Transactional
     public void registerOrder(OrderViewDto orderViewDto) {
 
@@ -47,12 +60,13 @@ public class OrderFacadeService {
 
         //시간 요구조건 확인
 
+
         //주문기본 내용 저장
-        OrderDto orderDto = orderMapper.toOrderDomainDto(orderViewDto);
+        OrderDto orderDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
         Order savedOrder = orderService.registerOrder(orderDto);
 
         //주문 상품정보 저장
-        for (ProductViewDto productViewDto: orderViewDto.getProducts()) {
+        for (ProductViewDto productViewDto : orderViewDto.getProducts()) {
 
             ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);
 
@@ -73,7 +87,7 @@ public class OrderFacadeService {
 
                 assert (option.getProduct() != null);
                 boolean isMatch = optionService.matchProductAndOption(option, product.getId());
-                if (!isMatch){
+                if (!isMatch) {
                     log.error("option and product does not match option registered Fail");
                     continue;
                 }
@@ -83,11 +97,57 @@ public class OrderFacadeService {
         }
 
         //구매자 주문성공 안내 메세지 발송
+        //4 주문 성공 안내 메세지 발송
+        final SMSMessageDto smsMessageDto = smsService.makeSMSMessage(orderViewDto, SMSMessageType.ORDER_CONFIRM);
+        smsService.sendMessage(new ArrayList<>(Arrays.asList(smsMessageDto)));
 
         //관리자 Noti 발성
+        //5 관리자에게 Discord 메세지로 주문안내
+        discordBot.sendMessage("일반", smsMessageDto.getContent());
 
 
+    }
+
+    @Transactional(readOnly = true)
+    public OrderViewDto getOrderDetail(OrderViewDto orderViewDto) {
+
+        //기본주문정보
+        final OrderDto orderDomainDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
+        List<OrderProduct> orderProductList = orderService.getOrder(orderDomainDto);
+
+        assert(!orderProductList.isEmpty());
+
+        orderViewDto = orderMapper.toOrderViewDto(orderProductList.get(0).getOrder());
+
+        List<ProductViewDto> productViewDtoList = new ArrayList<>();
+
+        for (OrderProduct orderProduct : orderProductList) {
+            Product product = orderProduct.getProduct();
+            ProductViewDto productViewDto = productMapper.changeToProductViewDto(product);
 
 
+            List<OptionViewDto> optionViewDtoList = new ArrayList<>();
+
+            for (OptionDetail optionDetail : orderProduct.getOptionDetails()) {
+                OptionViewDto optionViewDto = optionMapper.changeToOptionViewDto(optionDetail.getOption());
+                optionViewDto.setDetailValue(optionDetail.getId(), optionDetail.getOptionValue());
+                optionViewDtoList.add(optionViewDto);
+            }
+            productViewDto.setOptionViewDtoList(optionViewDtoList);
+            productViewDtoList.add(productViewDto);
+        }
+
+        orderViewDto.setProductViewDtoList(productViewDtoList);
+
+        return orderViewDto;
+    }
+
+    public Page<OrderViewDto> getOrder(Pageable pageable) {
+
+        assert (pageable != null);
+        Page<OrderDto> orderList = orderService.getOrderList(pageable);
+        List<OrderViewDto> orderViewDtoList = orderList.stream().map(orderMapper::toOrderViewDto).collect(Collectors.toList());
+
+        return new PageImpl<>(orderViewDtoList, pageable, orderList.getTotalElements());
     }
 }

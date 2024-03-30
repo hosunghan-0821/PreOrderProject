@@ -13,7 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tb_order_product")
-public class OrderProduct {
+@ToString
+public class OrderProduct{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

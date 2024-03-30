@@ -7,5 +7,5 @@ public class ValidationMarker {
 
     public interface OnUpdate extends Default {}
 
-    public interface OnOrder extends Default {}
+    public interface OnRegisterOrder extends Default {}
 }
