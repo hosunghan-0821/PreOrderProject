@@ -10,8 +10,9 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR("서버 내부 오류", "500000"),
     INTERNAL_SERVER_ERROR_PARSING_ERROR("서버 내부 파싱 오류", "500001"),
     INVALID_ARGUMENT_EXCEPTION("요청하신 데이터에 문제가 있습니다.", "400000"),
-
-    INVALID_METHOD_ARGUMENT("요청하신 데이터의 유효성 검사에 실패하였습니다.", "400001");
+    INVALID_METHOD_ARGUMENT("요청하신 데이터의 유효성 검사에 실패하였습니다.", "400001"),
+    BUSINESS_LOGIC_EXCEPTION("비지니스 로직에 해당하는 예외입니다.","400002"),
+    BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER("허용되지 않는 주문시간입니다.","400003");
     private String defaultMessage;
     private String errorCode;
 

@@ -6,6 +6,7 @@ import com.preorder.domain.OrderProduct;
 import com.preorder.domain.Product;
 import com.preorder.dto.domaindto.OptionDto;
 import com.preorder.dto.mapper.OptionMapper;
+import com.preorder.global.error.exception.NotFoundException;
 import com.preorder.repository.OptionDetailRepository;
 import com.preorder.repository.OptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +62,7 @@ public class OptionService {
         assert (optionId > 0);
 
         return optionRepository.findById(optionId)
-                .orElseThrow(RuntimeException::new); // TO-DO Exception 변경 필요
+                .orElseThrow(NotFoundException::new); // TO-DO Exception 변경 필요
     }
 
     public void saveOptionDetail(OrderProduct orderProduct, Option option, String optionValue) {

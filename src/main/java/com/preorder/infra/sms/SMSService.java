@@ -61,11 +61,7 @@ public class SMSService {
             log.info("SMS 발신 성공");
 
         } catch (Exception e) {
-            /*
-             * TO-DO
-             * 응답받아서 Status-CODE 보고 난후 Exception 처리를 하든 뭘 하든 해야함
-             * */
-            e.printStackTrace();
+
             throw new InternalServerException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
@@ -155,12 +151,8 @@ public class SMSService {
 
             return encodeBase64String;
         } catch (Exception e) {
-            /*
-             *
-             * TO-DO Exception 처리 필요
-             *
-             * */
-            throw new RuntimeException();
+
+            throw new InternalServerException();
         }
 
     }

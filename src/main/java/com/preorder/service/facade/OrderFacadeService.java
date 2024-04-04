@@ -10,6 +10,8 @@ import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OptionViewDto;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
+import com.preorder.global.error.dto.ErrorCode;
+import com.preorder.global.error.exception.BusinessLogicException;
 import com.preorder.infra.discord.DiscordBot;
 import com.preorder.infra.sms.SMSMessageDto;
 import com.preorder.infra.sms.SMSMessageType;
@@ -63,7 +65,7 @@ public class OrderFacadeService {
 
         if (!orderService.checkReservationDate(orderViewDto.getReservationDate())) {
             log.error("reservation Date validation false");
-            throw new RuntimeException(""); // TO-DO 오류처리 및 로그
+            throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER); // TO-DO 오류처리 및 로그
         }
 
 
