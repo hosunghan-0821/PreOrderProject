@@ -62,7 +62,7 @@ public class OptionService {
         assert (optionId > 0);
 
         return optionRepository.findById(optionId)
-                .orElseThrow(NotFoundException::new); // TO-DO Exception 변경 필요
+                .orElseThrow(NotFoundException::new);
     }
 
     public void saveOptionDetail(OrderProduct orderProduct, Option option, String optionValue) {
