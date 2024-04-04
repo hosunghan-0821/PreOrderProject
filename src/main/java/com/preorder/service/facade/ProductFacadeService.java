@@ -64,7 +64,6 @@ public class ProductFacadeService {
             optionService.register(optionDto, registeredProduct);
         }
 
-        //image 저장 나중에
     }
 
     @Transactional(readOnly = true)

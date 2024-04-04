@@ -4,6 +4,8 @@ package com.preorder.infra.sms;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.global.config.ApplicationOptionConfig;
+import com.preorder.global.error.dto.ErrorCode;
+import com.preorder.global.error.exception.InternalServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -64,7 +66,7 @@ public class SMSService {
              * 응답받아서 Status-CODE 보고 난후 Exception 처리를 하든 뭘 하든 해야함
              * */
             e.printStackTrace();
-            throw new RuntimeException("메시지 오류");
+            throw new InternalServerException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
 

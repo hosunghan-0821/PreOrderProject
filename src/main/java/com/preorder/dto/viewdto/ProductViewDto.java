@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.util.List;
 
-import static com.preorder.global.error.ErrorMessage.NOT_NULL;
-import static com.preorder.global.error.ErrorMessage.NULL;
+import static com.preorder.global.error.dto.ErrorDetailMessage.NOT_NULL;
+import static com.preorder.global.error.dto.ErrorDetailMessage.NULL;
 import static com.preorder.global.validation.ValidationMarker.OnRegisterOrder;
 
 @AllArgsConstructor

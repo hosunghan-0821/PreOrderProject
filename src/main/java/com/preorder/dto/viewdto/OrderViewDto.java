@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 
-import static com.preorder.global.error.ErrorMessage.*;
+import static com.preorder.global.error.dto.ErrorDetailMessage.*;
 
 @AllArgsConstructor
 @NoArgsConstructor

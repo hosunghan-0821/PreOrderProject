@@ -6,7 +6,7 @@ import lombok.*;
 
 import javax.validation.constraints.Null;
 
-import static com.preorder.global.error.ErrorMessage.NULL;
+import static com.preorder.global.error.dto.ErrorDetailMessage.NULL;
 
 @AllArgsConstructor
 @NoArgsConstructor

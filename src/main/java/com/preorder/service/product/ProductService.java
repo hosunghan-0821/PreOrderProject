@@ -4,6 +4,8 @@ package com.preorder.service.product;
 import com.preorder.domain.Product;
 import com.preorder.dto.domaindto.ProductDto;
 import com.preorder.dto.mapper.ProductMapper;
+import com.preorder.global.error.dto.ErrorCode;
+import com.preorder.global.error.exception.InvalidArgumentException;
 import com.preorder.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,7 +40,7 @@ public class ProductService {
 
     public ProductDto getProductById(Long id) {
         assert (id != null && id > 0);
-        Product product = productRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Product product = productRepository.findById(id).orElseThrow(() -> new InvalidArgumentException(ErrorCode.INVALID_ARGUMENT_EXCEPTION));
         return mapper.changeToProductDomainDto(product);
     }
 
