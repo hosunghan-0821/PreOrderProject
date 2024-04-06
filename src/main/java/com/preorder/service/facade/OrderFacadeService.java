@@ -13,9 +13,8 @@ import com.preorder.dto.viewdto.ProductViewDto;
 import com.preorder.global.error.dto.ErrorCode;
 import com.preorder.global.error.exception.BusinessLogicException;
 import com.preorder.infra.discord.DiscordBot;
-import com.preorder.infra.sms.SMSMessageDto;
-import com.preorder.infra.sms.SMSMessageType;
-import com.preorder.infra.sms.SMSService;
+import com.preorder.infra.noti.INotiService;
+import com.preorder.infra.sms.MessageType;
 import com.preorder.service.order.OrderService;
 import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +49,7 @@ public class OrderFacadeService {
 
     private final ProductService productService;
 
-    private final SMSService smsService;
+    private final INotiService iNotiService;
 
     private final DiscordBot discordBot;
 
@@ -67,7 +65,6 @@ public class OrderFacadeService {
             log.error("reservation Date validation false");
             throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER); // TO-DO 오류처리 및 로그
         }
-
 
 
         //주문기본 내용 저장
@@ -107,12 +104,11 @@ public class OrderFacadeService {
 
         //구매자 주문성공 안내 메세지 발송
         //4 주문 성공 안내 메세지 발송
-        final SMSMessageDto smsMessageDto = smsService.makeSMSMessage(orderViewDto, SMSMessageType.ORDER_CONFIRM);
-        smsService.sendMessage(new ArrayList<>(Arrays.asList(smsMessageDto)));
+        String sendMessage = iNotiService.sendMessage(orderViewDto, MessageType.ORDER_CONFIRM);
 
         //관리자 Noti 발성
         //5 관리자에게 Discord 메세지로 주문안내
-        discordBot.sendMessage("일반", smsMessageDto.getContent());
+        discordBot.sendMessage("일반", sendMessage);
 
 
     }

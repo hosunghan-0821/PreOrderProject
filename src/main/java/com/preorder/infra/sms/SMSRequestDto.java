@@ -18,5 +18,5 @@ public class SMSRequestDto {
     private String countryCode;
     private String from;
     private String content;
-    private List<SMSMessageDto> messages;
+    private List<NotiMessageDto> messages;
 }

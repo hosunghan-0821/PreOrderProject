@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class SMSMessageDto {
+public class NotiMessageDto {
     private String to;
     private String content;
 }

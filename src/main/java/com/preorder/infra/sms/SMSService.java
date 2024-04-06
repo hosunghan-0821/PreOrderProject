@@ -6,6 +6,7 @@ import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.global.config.ApplicationOptionConfig;
 import com.preorder.global.error.dto.ErrorCode;
 import com.preorder.global.error.exception.InternalServerException;
+import com.preorder.infra.noti.INotiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -17,12 +18,13 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class SMSService {
+public class SMSService implements INotiService {
     @Value("${naver-cloud-sms.accessKey}")
     private String accessKey;
 
@@ -41,8 +43,7 @@ public class SMSService {
 
     private final ApplicationOptionConfig applicationOptionConfig;
 
-    @Async
-    public void sendMessage(List<SMSMessageDto> SMSMessageDtoList) {
+    public void sendMessage(List<NotiMessageDto> NotiMessageDtoList) {
 
         if(!applicationOptionConfig.isSMSService()){
             log.info("SMS Service off");
@@ -50,7 +51,7 @@ public class SMSService {
         }
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = makeSMSRequestHeader();
-        final SMSRequestDto smsRequestDto = makeSMSRequestDto(SMSMessageDtoList);
+        final SMSRequestDto smsRequestDto = makeSMSRequestDto(NotiMessageDtoList);
 
         try {
             String body = objectMapper.writeValueAsString(smsRequestDto);
@@ -68,17 +69,17 @@ public class SMSService {
 
     }
 
-    public <T> SMSMessageDto makeSMSMessage(T data, SMSMessageType smsMessageType) {
+    public <T> NotiMessageDto makeSMSMessage(T data, MessageType messageType) {
 
-        switch (smsMessageType) {
+        switch (messageType) {
             case ORDER_CONFIRM:
                 if (data instanceof OrderViewDto) {
                     OrderViewDto orderViewDto = (OrderViewDto) data;
-                    SMSMessageDto smsMessageDto = new SMSMessageDto();
-                    smsMessageDto.setTo(orderViewDto.getClientPhoneNum().replaceAll("-", ""));
-                    smsMessageDto.setContent(smsMessageBuilder.makeMessageConfirm(orderViewDto));
-                    log.info(smsMessageDto.getContent());
-                    return smsMessageDto;
+                    NotiMessageDto notiMessageDto = new NotiMessageDto();
+                    notiMessageDto.setTo(orderViewDto.getClientPhoneNum().replaceAll("-", ""));
+                    notiMessageDto.setContent(smsMessageBuilder.makeMessageConfirm(orderViewDto));
+                    log.info(notiMessageDto.getContent());
+                    return notiMessageDto;
                 }
 
                 break;
@@ -95,7 +96,7 @@ public class SMSService {
         return null;
     }
 
-    private SMSRequestDto makeSMSRequestDto(List<SMSMessageDto> smsMessageDtoList) {
+    private SMSRequestDto makeSMSRequestDto(List<NotiMessageDto> notiMessageDtoList) {
 
 
         return SMSRequestDto.builder()
@@ -104,7 +105,7 @@ public class SMSService {
                 .countryCode("82")
                 .from(phone.replace("\"",""))
                 .content("[파리바게트 다이아몬드 광장점]")
-                .messages(smsMessageDtoList)
+                .messages(notiMessageDtoList)
                 .build();
 
     }
@@ -156,4 +157,15 @@ public class SMSService {
         }
 
     }
+
+    @Override
+    @Async
+    public String sendMessage(OrderViewDto orderViewDto, MessageType messageType) {
+        final NotiMessageDto notiMessageDto = makeSMSMessage(orderViewDto, MessageType.ORDER_CONFIRM);
+        sendMessage(Arrays.asList(notiMessageDto));
+
+        return notiMessageDto.getContent().toString();
+    }
+
+
 }
