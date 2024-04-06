@@ -1,4 +1,4 @@
-package com.preorder.infra.noti.sms;
+package com.preorder.infra.noti.common;
 
 
 import com.preorder.dto.viewdto.OrderViewDto;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class SMSMessageBuilder {
+public class MessageBuilder {
 
     private static final String MESSAGE_HEADER_PREFIX = "[파리바게트 다이아몬드 광장점]";
 

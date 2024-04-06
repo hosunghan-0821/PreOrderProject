@@ -13,10 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 
 @Service
@@ -88,5 +85,15 @@ public class OrderService {
         }
         return false;
 
+    }
+
+    public List<OrderProduct> getProductToOrder() {
+        LocalDate currentDate = Instant.now().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate findOrderDate = currentDate.plusDays(2);
+
+        Instant startDate = findOrderDate.atStartOfDay().toInstant(ZoneOffset.UTC);
+        Instant endDate = findOrderDate.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+
+        return orderProductRepository.findOrderByDate(startDate, endDate);
     }
 }

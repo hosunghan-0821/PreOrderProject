@@ -6,7 +6,9 @@ import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.global.config.ApplicationOptionConfig;
 import com.preorder.global.error.dto.ErrorCode;
 import com.preorder.global.error.exception.InternalServerException;
+import com.preorder.global.error.exception.InvalidArgumentException;
 import com.preorder.infra.noti.common.INotiService;
+import com.preorder.infra.noti.common.MessageBuilder;
 import com.preorder.infra.noti.common.MessageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +42,7 @@ public class SMSService implements INotiService {
 
     private final ObjectMapper objectMapper;
 
-    private final SMSMessageBuilder smsMessageBuilder;
+    private final MessageBuilder messageBuilder;
 
     private final ApplicationOptionConfig applicationOptionConfig;
 
@@ -78,7 +80,7 @@ public class SMSService implements INotiService {
                     OrderViewDto orderViewDto = (OrderViewDto) data;
                     NotiMessageDto notiMessageDto = new NotiMessageDto();
                     notiMessageDto.setTo(orderViewDto.getClientPhoneNum().replaceAll("-", ""));
-                    notiMessageDto.setContent(smsMessageBuilder.makeMessageConfirm(orderViewDto));
+                    notiMessageDto.setContent(messageBuilder.makeMessageConfirm(orderViewDto));
                     log.info(notiMessageDto.getContent());
                     return notiMessageDto;
                 }
@@ -91,10 +93,9 @@ public class SMSService implements INotiService {
                  * */
                 break;
             default:
-                break;
+               break;
         }
-
-        return null;
+        throw new InvalidArgumentException(ErrorCode.INVALID_ARGUMENT_EXCEPTION);
     }
 
     private SMSRequestDto makeSMSRequestDto(List<NotiMessageDto> notiMessageDtoList) {
