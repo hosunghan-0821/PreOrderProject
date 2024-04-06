@@ -1,4 +1,4 @@
-package com.preorder.infra.sms;
+package com.preorder.infra.noti.sms;
 
 
 import com.preorder.dto.viewdto.OrderViewDto;

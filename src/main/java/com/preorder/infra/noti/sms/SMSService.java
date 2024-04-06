@@ -1,4 +1,4 @@
-package com.preorder.infra.sms;
+package com.preorder.infra.noti.sms;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,8 @@ import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.global.config.ApplicationOptionConfig;
 import com.preorder.global.error.dto.ErrorCode;
 import com.preorder.global.error.exception.InternalServerException;
-import com.preorder.infra.noti.INotiService;
+import com.preorder.infra.noti.common.INotiService;
+import com.preorder.infra.noti.common.MessageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;

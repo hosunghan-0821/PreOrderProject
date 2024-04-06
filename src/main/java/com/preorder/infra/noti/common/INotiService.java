@@ -1,7 +1,6 @@
-package com.preorder.infra.noti;
+package com.preorder.infra.noti.common;
 
 import com.preorder.dto.viewdto.OrderViewDto;
-import com.preorder.infra.sms.MessageType;
 
 public interface INotiService {
 
