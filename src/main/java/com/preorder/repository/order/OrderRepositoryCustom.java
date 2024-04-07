@@ -1,4 +1,4 @@
-package com.preorder.repository;
+package com.preorder.repository.order;
 
 import com.preorder.dto.domaindto.OrderDto;
 import org.springframework.data.domain.Page;

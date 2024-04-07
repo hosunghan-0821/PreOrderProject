@@ -6,7 +6,7 @@ import com.preorder.dto.domaindto.ProductDto;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.global.error.dto.ErrorCode;
 import com.preorder.global.error.exception.InvalidArgumentException;
-import com.preorder.repository.ProductRepository;
+import com.preorder.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

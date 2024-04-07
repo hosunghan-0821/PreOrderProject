@@ -1,4 +1,4 @@
-package com.preorder.repository;
+package com.preorder.repository.product;
 
 import com.preorder.domain.OptionDetail;
 import org.springframework.data.jpa.repository.JpaRepository;

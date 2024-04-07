@@ -1,8 +1,9 @@
-package com.preorder.repository;
+package com.preorder.repository.order;
 
 import com.preorder.domain.Order;
 import com.preorder.dto.domaindto.OrderDto;
 import com.preorder.dto.mapper.OrderMapper;
+import com.preorder.repository.order.OrderRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,7 @@ import static com.preorder.domain.QOrder.order;
 
 @Repository
 @RequiredArgsConstructor
-public class OrderRepositoryCustomImpl implements  OrderRepositoryCustom{
+public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
 
     private final JPAQueryFactory jpaQueryFactory;

@@ -7,8 +7,8 @@ import com.preorder.domain.Product;
 import com.preorder.dto.domaindto.OptionDto;
 import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.global.error.exception.NotFoundException;
-import com.preorder.repository.OptionDetailRepository;
-import com.preorder.repository.OptionRepository;
+import com.preorder.repository.product.OptionDetailRepository;
+import com.preorder.repository.product.OptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

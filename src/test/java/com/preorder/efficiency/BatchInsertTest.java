@@ -4,7 +4,7 @@ import com.preorder.PreOrderApplication;
 import com.preorder.domain.Product;
 import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.dto.mapper.ProductMapper;
-import com.preorder.repository.ProductRepository;
+import com.preorder.repository.product.ProductRepository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

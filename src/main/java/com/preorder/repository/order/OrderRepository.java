@@ -1,4 +1,4 @@
-package com.preorder.repository;
+package com.preorder.repository.order;
 
 import com.preorder.domain.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
