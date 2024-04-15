@@ -10,3 +10,9 @@ services:
     environment:
       - POSTGRES_PASSWORD=hosung
       - POSTGRES_USER=hosung
+
+    networks:
+      - bridge
+
+networks:
+  bridge:

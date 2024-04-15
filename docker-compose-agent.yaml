@@ -1,0 +1,14 @@
+services:
+
+  scouter-agent:
+    image: scouter-agent
+    build:
+      context: .
+      dockerfile: dockerfile_agent
+    ports:
+      - 8084:8084
+    networks:
+      - bridge
+
+networks:
+  bridge:

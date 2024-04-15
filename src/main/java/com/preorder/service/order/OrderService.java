@@ -40,6 +40,8 @@ public class OrderService {
 
     public OrderProduct registerOrderProduct(Order savedOrder, Product product) {
 
+        assert (savedOrder.getId() != null);
+        assert (product.getId() != null);
 
         OrderProduct orderProduct = OrderProduct.builder()
                 .order(savedOrder)
