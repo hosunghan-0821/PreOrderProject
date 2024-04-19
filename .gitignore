@@ -40,3 +40,4 @@ db
 src/main/resources/*.yaml
 
 
+scouter/agent.host/*
