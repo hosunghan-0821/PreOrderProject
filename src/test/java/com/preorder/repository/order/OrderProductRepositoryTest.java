@@ -29,7 +29,7 @@ class OrderProductRepositoryTest {
     private OrderProductRepository orderProductRepository;
 
     @Test
-    @DisplayName("주문조회")
+    @DisplayName("[성공] : 주문조회")
     void findOrderProductByClientNameAndClientPhoneNum() {
         //given
 
@@ -67,7 +67,7 @@ class OrderProductRepositoryTest {
     }
 
     @Test
-    @DisplayName("주문 기간에 따르 조회")
+    @DisplayName("[성공] : 주문 기간에 따르 조회")
     void findOrderByDate() {
         //given
 

@@ -20,7 +20,7 @@ public class OrderRepositoryTest {
     private OrderRepository orderRepository;
 
     @Test
-    @DisplayName("주문 테스트")
+    @DisplayName("[성공] : 주문 테스트")
     void registerOrder(){
         //given
         Order order = Order.builder()
@@ -37,7 +37,7 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    @DisplayName("주문조회 테스트")
+    @DisplayName("[성공] : 주문조회 테스트")
     void findOrder(){
         //given
 
