@@ -48,9 +48,9 @@ public class ProductService {
         assert (productDto != null);
         assert (productDto.getId() != null);
 
-        Product product = productRepository.findById(productDto.getId()).orElseThrow(IllegalArgumentException::new);
+        Product product = productRepository.findById(productDto.getId()).orElseThrow(InvalidArgumentException::new);
 
-        product.updateData(productDto.getName(), product.getCategory(), product.getPrice());
+        product.updateData(productDto.getName(), productDto.getCategory(), productDto.getPrice());
 
         return product;
     }
@@ -76,7 +76,7 @@ public class ProductService {
         assert (productId > 0);
 
         return productRepository.findById(productId)
-                .orElseThrow(RuntimeException::new); // 오류처리 변경해야함
+                .orElseThrow(InvalidArgumentException::new); // 오류처리 변경해야함
 
     }
 }
