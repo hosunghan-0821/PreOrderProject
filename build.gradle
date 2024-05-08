@@ -70,6 +70,11 @@ dependencies {
 	//Discord Bot
 	implementation 'net.dv8tion:JDA:5.0.0-beta.5'
 
+
+	//ehcache & spring cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'net.sf.ehcache:ehcache:2.10.3'
+
 	//mockito
 	testImplementation 'org.mockito:mockito-core:4.8.0'
 	testImplementation 'net.bytebuddy:byte-buddy:1.14.13'

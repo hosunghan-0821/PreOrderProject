@@ -8,10 +8,13 @@ import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OptionViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
+import com.preorder.global.cache.CacheString;
 import com.preorder.global.util.ProductExcelReader;
 import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -66,6 +69,7 @@ public class ProductFacadeService {
 
     }
 
+    @Cacheable(cacheNames = CacheString.PRODUCT_CACHE, key = "#pageable.getPageNumber" + "-"+"#pageable.getPageSize")
     @Transactional(readOnly = true)
     public Page<ProductViewDto> getProductList(Pageable pageable) {
 
@@ -78,6 +82,7 @@ public class ProductFacadeService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = CacheString.PRODUCT_DETAIL_CACHE, key = "#id")
     public ProductViewDto getProductDetail(Long id) {
 
         assert (id != null && id > 0);
@@ -99,6 +104,7 @@ public class ProductFacadeService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = CacheString.PRODUCT_DETAIL_CACHE, key = "#id")
     public void updateProduct(ProductViewDto productViewDto) {
         assert (productViewDto != null);
         assert (productViewDto.getId() != null);

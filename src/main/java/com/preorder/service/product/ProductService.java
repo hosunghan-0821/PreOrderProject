@@ -4,10 +4,12 @@ package com.preorder.service.product;
 import com.preorder.domain.Product;
 import com.preorder.dto.domaindto.ProductDto;
 import com.preorder.dto.mapper.ProductMapper;
+import com.preorder.global.cache.CacheString;
 import com.preorder.global.error.dto.ErrorCode;
 import com.preorder.global.error.exception.InvalidArgumentException;
 import com.preorder.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ public class ProductService {
 
     private final ProductMapper mapper;
 
+
+    @CacheEvict(value = CacheString.PRODUCT_CACHE, allEntries = true)
     public Product register(ProductDto productDto) {
 
         assert (productDto != null);
@@ -43,7 +47,7 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow(() -> new InvalidArgumentException(ErrorCode.INVALID_ARGUMENT_EXCEPTION));
         return mapper.changeToProductDomainDto(product);
     }
-
+    @CacheEvict(value = CacheString.PRODUCT_CACHE, allEntries = true)
     public Product updateProduct(ProductDto productDto) {
         assert (productDto != null);
         assert (productDto.getId() != null);
@@ -56,6 +60,7 @@ public class ProductService {
     }
 
 
+    @CacheEvict(value = CacheString.PRODUCT_CACHE, allEntries = true)
     public void deleteProduct(Long id) {
         assert (id != null && id > 0);
 
@@ -63,6 +68,7 @@ public class ProductService {
 
     }
 
+    @CacheEvict(value = CacheString.PRODUCT_CACHE, allEntries = true)
     public void bulkRegisterProduct(List<ProductDto> productDtoList) {
 
         List<Product> productList = productDtoList.stream().map(mapper::changeToProduct).collect(Collectors.toList());

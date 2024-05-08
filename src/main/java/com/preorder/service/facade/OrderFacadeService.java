@@ -10,6 +10,7 @@ import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OptionViewDto;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
+import com.preorder.global.cache.CacheString;
 import com.preorder.global.error.dto.ErrorCode;
 import com.preorder.global.error.exception.BusinessLogicException;
 import com.preorder.infra.discord.DiscordBot;
@@ -20,6 +21,7 @@ import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -114,6 +116,7 @@ public class OrderFacadeService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheString.ORDER_DETAIL_CACHE, key = "#orderViewDto.getId")
     public OrderViewDto getOrderDetail(OrderViewDto orderViewDto) {
 
         //기본주문정보
