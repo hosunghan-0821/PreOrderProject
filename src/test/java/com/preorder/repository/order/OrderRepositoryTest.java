@@ -2,6 +2,7 @@ package com.preorder.repository.order;
 
 import com.preorder.config.TestConfiguration;
 import com.preorder.domain.Order;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,9 +20,12 @@ public class OrderRepositoryTest {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private JPAQueryFactory jpaQueryFactory;
+
     @Test
     @DisplayName("[성공] : 주문 테스트")
-    void registerOrder(){
+    void registerOrder() {
         //given
         Order order = Order.builder()
                 .clientName("한호성")
@@ -36,9 +40,10 @@ public class OrderRepositoryTest {
         Assertions.assertThat(order.getClientName()).isEqualTo("한호성");
     }
 
+
     @Test
     @DisplayName("[성공] : 주문조회 테스트")
-    void findOrder(){
+    void findOrder() {
         //given
 
         Order order = Order.builder()
@@ -62,7 +67,6 @@ public class OrderRepositoryTest {
 
 
     }
-
 
 
 }

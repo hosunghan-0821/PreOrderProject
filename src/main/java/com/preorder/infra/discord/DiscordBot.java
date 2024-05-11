@@ -83,7 +83,6 @@ public class DiscordBot extends ListenerAdapter {
             log.error("유효하지 않은 채널이름 : {}",channelName);
         }
 
-
     }
 
 

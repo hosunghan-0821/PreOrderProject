@@ -12,7 +12,9 @@ public enum ErrorCode {
     INVALID_ARGUMENT_EXCEPTION("요청하신 데이터에 문제가 있습니다.", "400000"),
     INVALID_METHOD_ARGUMENT("요청하신 데이터의 유효성 검사에 실패하였습니다.", "400001"),
     BUSINESS_LOGIC_EXCEPTION("비지니스 로직에 해당하는 예외입니다.","400002"),
-    BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER("허용되지 않는 주문시간입니다.","400003");
+    BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER("허용되지 않는 주문시간입니다.","400003"),
+
+    BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR("상품 재고가 부족합니다.","400004");
     private String defaultMessage;
     private String errorCode;
 

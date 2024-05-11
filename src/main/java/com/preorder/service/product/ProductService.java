@@ -47,6 +47,7 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow(() -> new InvalidArgumentException(ErrorCode.INVALID_ARGUMENT_EXCEPTION));
         return mapper.changeToProductDomainDto(product);
     }
+
     @CacheEvict(value = CacheString.PRODUCT_CACHE, allEntries = true)
     public Product updateProduct(ProductDto productDto) {
         assert (productDto != null);
@@ -84,5 +85,18 @@ public class ProductService {
         return productRepository.findById(productId)
                 .orElseThrow(InvalidArgumentException::new); // 오류처리 변경해야함
 
+    }
+
+    public List<Product> getProductByIds(List<Long> ids) {
+        assert (ids != null);
+        List<Product> allByIds = productRepository.findAllById(ids);
+
+
+        return allByIds;
+
+    }
+
+    public List<Product> getProductByIdsWithLock(List<Long> orderProductIdList) {
+        return productRepository.findAllByIdWithLock(orderProductIdList);
     }
 }

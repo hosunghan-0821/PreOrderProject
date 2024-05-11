@@ -1,9 +1,9 @@
 package com.preorder.service.facade;
 
-import com.preorder.domain.*;
-import com.preorder.dto.domaindto.OptionDto;
+import com.preorder.domain.OptionDetail;
+import com.preorder.domain.OrderProduct;
+import com.preorder.domain.Product;
 import com.preorder.dto.domaindto.OrderDto;
-import com.preorder.dto.domaindto.ProductDto;
 import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.dto.mapper.OrderMapper;
 import com.preorder.dto.mapper.ProductMapper;
@@ -16,8 +16,8 @@ import com.preorder.global.error.exception.BusinessLogicException;
 import com.preorder.infra.discord.DiscordBot;
 import com.preorder.infra.noti.common.INotiService;
 import com.preorder.infra.noti.common.MessageType;
+import com.preorder.service.order.OrderManageService;
 import com.preorder.service.order.OrderService;
-import com.preorder.service.product.OptionService;
 import com.preorder.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,62 +49,35 @@ public class OrderFacadeService {
 
     private final ProductMapper productMapper;
 
-    private final OptionService optionService;
-
     private final ProductService productService;
 
     private final INotiService iNotiService;
 
     private final DiscordBot discordBot;
 
-    @Transactional
+    private final OrderManageService orderManageService;
+
     public void registerOrder(OrderViewDto orderViewDto) {
 
-        assert (orderViewDto != null);
 
-        //시간 요구조건 확인
+        assert (orderViewDto != null);
         assert (orderViewDto.getReservationDate() != null);
 
         if (!orderService.checkReservationDate(orderViewDto.getReservationDate())) {
-            log.error("reservation Date validation false");
-            throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER); // TO-DO 오류처리 및 로그
+
+            throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER);
         }
 
-
-        //주문기본 내용 저장
-        OrderDto orderDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
-        Order savedOrder = orderService.registerOrder(orderDto);
-
-        //주문 상품정보 저장
-        for (ProductViewDto productViewDto : orderViewDto.getProducts()) {
-
-            ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);
-
-            assert (productDto != null);
-            Product product = productService.isExistProduct(productDto.getId());
-
-
-            OrderProduct orderProduct = orderService.registerOrderProduct(savedOrder, product);
-
-            //주문 옵션 저장
-            for (OptionViewDto optionViewDto : productViewDto.getOptions()) {
-                OptionDto optionDto = optionMapper.changeToOptionDomainDto(optionViewDto);
-
-                assert (optionDto.getId() != null);
-                assert (optionDto.getId() > 0);
-
-                Option option = optionService.isExistOption(optionDto.getId());
-
-                assert (option.getProduct() != null);
-                boolean isMatch = optionService.matchProductAndOption(option, product.getId());
-                if (!isMatch) {
-                    log.error("option and product does not match option registered Fail");
-                    continue;
-                }
-                optionService.saveOptionDetail(orderProduct, option, optionViewDto.getOptionValue());
-
-            }
+        //재고확인 1차 Early Return을 위해서 락없이
+        Map<Long, Long> orderInfoMap = getOrderInfoMap(orderViewDto.getProducts());
+        if (!checkProductNumIsValid(orderInfoMap)) {
+            throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
         }
+
+        //DB락 얻은 상태에서 제고 개수 다시 비교 및 처리
+        orderManageService.registerOrderWithLock(orderViewDto,orderInfoMap);
+
+        //After Commit EventListner로 처리..
 
         //구매자 주문성공 안내 메세지 발송
         //4 주문 성공 안내 메세지 발송
@@ -115,9 +90,15 @@ public class OrderFacadeService {
 
     }
 
+
     @Transactional(readOnly = true)
     @Cacheable(value = CacheString.ORDER_DETAIL_CACHE, key = "#orderViewDto.getId")
     public OrderViewDto getOrderDetail(OrderViewDto orderViewDto) {
+
+        //조회규칙 주문 ID,  핸드폰 번호,성명 모두 같아야 조회
+        assert (orderViewDto.getId() != null);
+        assert (orderViewDto.getClientName() != null && !orderViewDto.getClientName().isEmpty());
+        assert (orderViewDto.getClientPhoneNum() != null);
 
         //기본주문정보
         final OrderDto orderDomainDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
@@ -158,4 +139,42 @@ public class OrderFacadeService {
 
         return new PageImpl<>(orderViewDtoList, pageable, orderList.getTotalElements());
     }
+
+
+    private boolean checkProductNumIsValid(Map<Long, Long> productMap) {
+
+        assert (productMap != null);
+        assert (!productMap.isEmpty());
+
+
+        List<Long> collect = new ArrayList<>(productMap.keySet());
+        List<Product> productInfoList = productService.getProductByIds(collect);
+
+
+        for (var product : productInfoList) {
+            Long orderProductNum = productMap.get(product.getId());
+            if (orderProductNum > product.getProductNum()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+
+    public Map<Long, Long> getOrderInfoMap(List<ProductViewDto> products) {
+        Map<Long, Long> productMap = new HashMap<>();
+        //상품 개수 정보 추출
+        for (var productViewDto : products) {
+            Long id = productViewDto.getId();
+            if (!productMap.containsKey(id)) {
+                productMap.put(id, 1L);
+            } else {
+                productMap.put(id, productMap.get(id) + 1);
+            }
+        }
+        return productMap;
+    }
+
 }
