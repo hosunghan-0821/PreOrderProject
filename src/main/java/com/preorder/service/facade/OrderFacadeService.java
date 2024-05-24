@@ -64,15 +64,11 @@ public class OrderFacadeService {
         assert (orderViewDto.getReservationDate() != null);
 
         if (!orderService.checkReservationDate(orderViewDto.getReservationDate())) {
-
             throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REGISTER_ORDER);
         }
 
-        //재고확인 1차 Early Return을 위해서 락없이
         Map<Long, Long> orderInfoMap = getOrderInfoMap(orderViewDto.getProducts());
-        if (!checkProductNumIsValid(orderInfoMap)) {
-            throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
-        }
+
 
         //DB락 얻은 상태에서 제고 개수 다시 비교 및 처리
         orderManageService.registerOrderWithLock(orderViewDto,orderInfoMap);

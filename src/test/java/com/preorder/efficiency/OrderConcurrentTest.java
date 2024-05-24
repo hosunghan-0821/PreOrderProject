@@ -6,10 +6,14 @@ import com.preorder.domain.Product;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
+import com.preorder.global.cache.CacheString;
 import com.preorder.repository.order.OrderRepository;
 import com.preorder.repository.product.ProductRepository;
 import com.preorder.service.facade.OrderFacadeService;
 import com.preorder.service.order.OrderManageService;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +50,9 @@ public class OrderConcurrentTest {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     @Test
     @DisplayName("")
     public void orderConcurrentTest() throws InterruptedException {
@@ -56,7 +63,7 @@ public class OrderConcurrentTest {
         Product product = Product.builder()
                 .price(1000)
                 .name("hhh")
-                .productNum(10L)
+                .productNum(30L)
                 .build();
 
         Product product1 = Product.builder()
@@ -87,11 +94,22 @@ public class OrderConcurrentTest {
         productViewDto1.setOptionViewDtoList(new ArrayList<>());
         productViewDto2.setOptionViewDtoList(new ArrayList<>());
 
-        List<ProductViewDto> productViewDtoList = Arrays.asList(productViewDto, productViewDto1, productViewDto2);
+        List<ProductViewDto> productViewDtoList = Arrays.asList(productViewDto, productViewDto);
         Map<Long, Long> orderInfoMap = orderFacadeService.getOrderInfoMap(productViewDtoList);
 
+
+        cacheManager.addCache(CacheString.PRODUCT_COUNT_CACHE);
+        Cache cache = cacheManager.getCache(CacheString.PRODUCT_COUNT_CACHE);
+        cacheManager.getTransactionController().begin();
+        cache.put(new Element(product.getId(), product.getProductNum()));
+        Long setNum = (Long) cache.get(product.getId()).getObjectValue();
+        cacheManager.getTransactionController().commit();
+
+        Assertions.assertThat(setNum).isEqualTo(product.getProductNum());
+
+
         //when
-        int threadCnt = 20;
+        int threadCnt = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         CountDownLatch countDownLatch = new CountDownLatch(threadCnt);
 
@@ -118,13 +136,19 @@ public class OrderConcurrentTest {
 
 
         //then
-        List<Product> productList = productRepository.findAllById(Arrays.asList(1L, 2L, 3L));
-        for (var productInfo : productList) {
-            Assertions.assertThat(productInfo.getProductNum()).isEqualTo(0);
-        }
+        cache = cacheManager.getCache(CacheString.PRODUCT_COUNT_CACHE);
+
+        Element element = cache.get(save.getId());
+        Long remainNum = (Long) element.getObjectValue();
+
+        Assertions.assertThat(remainNum).isEqualTo(10L);
+//        List<Product> productList = productRepository.findAllById(Arrays.asList(1L, 2L, 3L));
+//        for (var productInfo : productList) {
+//            Assertions.assertThat(productInfo.getProductNum()).isEqualTo(0);
+//        }
 
         List<Order> orderList = orderRepository.findAll();
-        Assertions.assertThat(orderList.size()).isEqualTo(10);
+        Assertions.assertThat(orderList.size()).isEqualTo(threadCnt);
 
 
     }
