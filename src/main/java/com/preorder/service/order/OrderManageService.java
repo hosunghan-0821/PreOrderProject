@@ -78,58 +78,7 @@ public class OrderManageService {
                     throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
                 }
             }
-
-            List<Product> productList = productService.getProductByIds(orderProductIdList);
-
-
-            //개수 확인 및 감소시키기 부족하면 Exception
-//            for (var product : productList) {
-//                Long orderNum = orderMapInfo.get(product.getId());
-//                Long remainNum = product.getProductNum();
-//
-//                if (orderNum > remainNum) {
-//                    throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
-//                }
-//                product.updateProductNum(orderNum);
-//            }
-
-
-            //주문기본 내용 저장
-            OrderDto orderDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
-            Order savedOrder = orderService.registerOrder(orderDto);
-
-            //주문 상품정보 저장
-            for (ProductViewDto productViewDto : orderViewDto.getProducts()) {
-
-                ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);
-
-                assert (productDto != null);
-                Product product = productService.isExistProduct(productDto.getId());
-
-
-                OrderProduct orderProduct = orderService.registerOrderProduct(savedOrder, product);
-
-                //주문 옵션 저장
-                for (OptionViewDto optionViewDto : productViewDto.getOptions()) {
-                    OptionDto optionDto = optionMapper.changeToOptionDomainDto(optionViewDto);
-
-                    assert (optionDto.getId() != null);
-                    assert (optionDto.getId() > 0);
-
-                    Option option = optionService.isExistOption(optionDto.getId());
-
-                    assert (option.getProduct() != null);
-                    boolean isMatch = optionService.matchProductAndOption(option, product.getId());
-                    if (!isMatch) {
-                        log.error("option and product does not match option registered Fail");
-                        continue;
-                    }
-                    optionService.saveOptionDetail(orderProduct, option, optionViewDto.getOptionValue());
-                }
-
-            }
             transactionController.commit();
-
         } catch (Exception e) {
             try {
                 transactionController.rollback();
@@ -142,6 +91,56 @@ public class OrderManageService {
             for (var entry : orderMapInfo.entrySet()) {
                 cache.releaseWriteLockOnKey(entry.getKey());
             }
+        }
+
+        List<Product> productList = productService.getProductByIds(orderProductIdList);
+
+
+        //개수 확인 및 감소시키기 부족하면 Exception
+//            for (var product : productList) {
+//                Long orderNum = orderMapInfo.get(product.getId());
+//                Long remainNum = product.getProductNum();
+//
+//                if (orderNum > remainNum) {
+//                    throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
+//                }
+//                product.updateProductNum(orderNum);
+//            }
+
+
+        //주문기본 내용 저장
+        OrderDto orderDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
+        Order savedOrder = orderService.registerOrder(orderDto);
+
+        //주문 상품정보 저장
+        for (ProductViewDto productViewDto : orderViewDto.getProducts()) {
+
+            ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);
+
+            assert (productDto != null);
+            Product product = productService.isExistProduct(productDto.getId());
+
+
+            OrderProduct orderProduct = orderService.registerOrderProduct(savedOrder, product);
+
+            //주문 옵션 저장
+            for (OptionViewDto optionViewDto : productViewDto.getOptions()) {
+                OptionDto optionDto = optionMapper.changeToOptionDomainDto(optionViewDto);
+
+                assert (optionDto.getId() != null);
+                assert (optionDto.getId() > 0);
+
+                Option option = optionService.isExistOption(optionDto.getId());
+
+                assert (option.getProduct() != null);
+                boolean isMatch = optionService.matchProductAndOption(option, product.getId());
+                if (!isMatch) {
+                    log.error("option and product does not match option registered Fail");
+                    continue;
+                }
+                optionService.saveOptionDetail(orderProduct, option, optionViewDto.getOptionValue());
+            }
+
         }
     }
 }
