@@ -73,8 +73,7 @@ dependencies {
 
 	//ehcache & spring cache
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
-	implementation 'net.sf.ehcache:ehcache:2.10.3'
-
+	implementation 'net.sf.ehcache:ehcache:2.10.9.2'
 	//mockito
 	testImplementation 'org.mockito:mockito-core:4.8.0'
 	testImplementation 'net.bytebuddy:byte-buddy:1.14.13'
