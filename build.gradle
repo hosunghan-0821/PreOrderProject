@@ -1,28 +1,30 @@
 buildscript {
-	dependencies {
-		classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10")
-	}
-	ext {
-		queryDslVersion = "5.0.0"
-	}
+    dependencies {
+        classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10")
+    }
+    ext {
+        queryDslVersion = "5.0.0"
+    }
 }
 
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.6.0'
-	id 'io.spring.dependency-management' version '1.1.4'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'java'
+    id 'org.springframework.boot' version '2.6.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+
+    id 'jacoco'
 }
 
 group = 'com.preorder'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '11'
+    sourceCompatibility = '11'
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
@@ -30,91 +32,88 @@ ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
 
 dependencies {
 
-	//Spring Basic
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    //Spring Basic
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	runtimeOnly 'com.h2database:h2'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.7'
-
-
-	//Lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-
-	//QueryDSL
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.7'
 
 
-	//MapStruct
-	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
-	annotationProcessor "org.mapstruct:mapstruct-processor:1.4.2.Final"
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    //Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    //QueryDSL
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 
-	//validation
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-	//postgresql
-	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
-	runtimeOnly 'org.postgresql:postgresql'
+    //MapStruct
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.4.2.Final"
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
 
-	//excel reader poi
-	implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
-	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    //validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	//Discord Bot
-	implementation 'net.dv8tion:JDA:5.0.0-beta.5'
+    //postgresql
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
+    runtimeOnly 'org.postgresql:postgresql'
 
 
-	//ehcache & spring cache
-	implementation 'org.springframework.boot:spring-boot-starter-cache'
-	implementation 'net.sf.ehcache:ehcache:2.10.9.2'
-	//mockito
-	testImplementation 'org.mockito:mockito-core:4.8.0'
-	testImplementation 'net.bytebuddy:byte-buddy:1.14.13'
-	testImplementation 'org.objenesis:objenesis:3.3'
+    //excel reader poi
+    implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 
-	//prod - log4j2
-	ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
-	if (ext.profile == 'prod' || ext.profile=='packaging') {
-		implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
-		implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
-		implementation group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.17.1'
-		implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.1'
-		implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
-		implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.32'
+    //Discord Bot
+    implementation 'net.dv8tion:JDA:5.0.0-beta.5'
 
-		implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
-	}
+
+    //ehcache & spring cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'net.sf.ehcache:ehcache:2.10.9.2'
+    //mockito
+    testImplementation 'org.mockito:mockito-core:4.8.0'
+    testImplementation 'net.bytebuddy:byte-buddy:1.14.13'
+    testImplementation 'org.objenesis:objenesis:3.3'
+
+    //prod - log4j2
+    ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+    if (ext.profile == 'prod' || ext.profile == 'packaging') {
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.17.1'
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.1'
+        implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
+        implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.32'
+
+        implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+    }
 
 }
 
-if (ext.profile == 'prod' || ext.profile=='packaging') {
-	configurations {
-		all {
-			exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-		}
-	}
+if (ext.profile == 'prod' || ext.profile == 'packaging') {
+    configurations {
+        all {
+            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        }
+    }
 }
-
 
 
 jar {
-	enabled = false
+    enabled = false
 }
 
 
-
-
 configurations {
-	compileOnly{
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 apply plugin: "com.ewerk.gradle.plugins.querydsl"
@@ -122,25 +121,59 @@ apply plugin: "com.ewerk.gradle.plugins.querydsl"
 def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
+    jpa = true
+    querydslSourcesDir = querydslDir
 }
 sourceSets {
-	main.java.srcDir querydslDir
+    main.java.srcDir querydslDir
 }
 
-compileQuerydsl{
-	options.annotationProcessorPath = configurations.querydsl
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
 
+jacoco {
+    // JaCoCo 버전
+    toolVersion = '0.8.8'
+}
+
+//테스트 리포트 저장
+jacocoTestReport {
+    reports {
+        // 원하는 리포트를 켜고 끌 수 있다.
+        xml.required = false
+        csv.required = false
+        html.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            '**/*Application*',
+                            '**/*Exception*',
+                            '**/dto/**',
+                            '**/domain/**',
+                            '**/*Cache*',
+                            '**/infra/**',
+                            '**/scheduler/**',
+                            '**/*Config',
+                            '**/global/**'
+                            // ...
+                    ])
+                })
+        )
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}

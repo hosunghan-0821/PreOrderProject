@@ -1,13 +1,17 @@
 package com.preorder.efficiency;
 
 import com.preorder.PreOrderApplication;
+import com.preorder.domain.Option;
 import com.preorder.domain.Order;
 import com.preorder.domain.Product;
+import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.dto.mapper.ProductMapper;
+import com.preorder.dto.viewdto.OptionViewDto;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
 import com.preorder.global.cache.CacheString;
 import com.preorder.repository.order.OrderRepository;
+import com.preorder.repository.product.OptionRepository;
 import com.preorder.repository.product.ProductRepository;
 import com.preorder.service.facade.OrderFacadeService;
 import com.preorder.service.order.OrderManageService;
@@ -37,6 +41,10 @@ public class OrderConcurrentTest {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private OptionMapper optionMapper;
+
     @Autowired
     private OrderManageService orderManageService;
 
@@ -46,6 +54,9 @@ public class OrderConcurrentTest {
     @Autowired
     private OrderFacadeService orderFacadeService;
 
+    @Autowired
+    private OptionRepository optionRepository;
+
 
     @Autowired
     private OrderRepository orderRepository;
@@ -54,7 +65,7 @@ public class OrderConcurrentTest {
     private CacheManager cacheManager;
 
     @Test
-    @DisplayName("")
+    @DisplayName("[성공] : 사전예약동시섬 확인 테스트 코드")
     public void orderConcurrentTest() throws InterruptedException {
 
         //given
@@ -82,6 +93,15 @@ public class OrderConcurrentTest {
         Product save1 = productRepository.save(product1);
         Product save2 = productRepository.save(product2);
 
+        Option option = Option.builder()
+                .name("토핑1")
+                .fee(500)
+                .optionType("옵션1")
+                .product(save)
+                .build();
+        Option savedOption = optionRepository.save(option);
+
+
         assert save.getId() == 1L;
         assert save1.getId() == 2L;
         assert save2.getId() == 3L;
@@ -90,7 +110,9 @@ public class OrderConcurrentTest {
         ProductViewDto productViewDto1 = productMapper.changeToProductViewDto(product1);
         ProductViewDto productViewDto2 = productMapper.changeToProductViewDto(product2);
 
-        productViewDto.setOptionViewDtoList(new ArrayList<>());
+        OptionViewDto optionViewDto = optionMapper.changeToOptionViewDto(savedOption);
+
+        productViewDto.setOptionViewDtoList(Arrays.asList(optionViewDto));
         productViewDto1.setOptionViewDtoList(new ArrayList<>());
         productViewDto2.setOptionViewDtoList(new ArrayList<>());
 
@@ -142,10 +164,7 @@ public class OrderConcurrentTest {
         Long remainNum = (Long) element.getObjectValue();
 
         Assertions.assertThat(remainNum).isEqualTo(10L);
-//        List<Product> productList = productRepository.findAllById(Arrays.asList(1L, 2L, 3L));
-//        for (var productInfo : productList) {
-//            Assertions.assertThat(productInfo.getProductNum()).isEqualTo(0);
-//        }
+
 
         List<Order> orderList = orderRepository.findAll();
         Assertions.assertThat(orderList.size()).isEqualTo(threadCnt);

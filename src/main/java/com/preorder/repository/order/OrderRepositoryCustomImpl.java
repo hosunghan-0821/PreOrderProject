@@ -3,7 +3,6 @@ package com.preorder.repository.order;
 import com.preorder.domain.Order;
 import com.preorder.dto.domaindto.OrderDto;
 import com.preorder.dto.mapper.OrderMapper;
-import com.preorder.repository.order.OrderRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
     private final OrderMapper orderMapper;
     @Override
-    public Page<OrderDto> getProductList(Pageable pageable) {
+    public Page<OrderDto> getOrderList(Pageable pageable) {
 
         List<Order> orderList = jpaQueryFactory.selectFrom(order)
                 .orderBy(order.id.desc())

@@ -62,7 +62,7 @@ public class OrderService {
 
     public Page<OrderDto> getOrderList(Pageable pageable) {
 
-        return orderRepository.getProductList(pageable);
+        return orderRepository.getOrderList(pageable);
 
     }
 

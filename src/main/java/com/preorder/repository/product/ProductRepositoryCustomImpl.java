@@ -56,7 +56,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
     public void bulkInsertProducts(List<Product> productList) {
 
 
-        String sql = "INSERT INTO product " +
+        String sql = "INSERT INTO tb_product " +
                 "(name,price,category,is_deleted) VALUES (?,?,?,?)";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {

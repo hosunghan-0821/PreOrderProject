@@ -146,6 +146,7 @@ class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("[성공] : 주문 다중조회 Controller")
     void getOrderList() throws Exception {
 
         //given
