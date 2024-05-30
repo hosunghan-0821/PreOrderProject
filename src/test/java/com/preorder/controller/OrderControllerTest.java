@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
 import com.preorder.service.facade.OrderFacadeService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -143,6 +144,23 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.clientName").exists())
                 .andExpect(jsonPath("$.reservationDate").exists())
                 .andExpect(jsonPath("$.products[0].id").exists());
+    }
+
+    @Test
+    @DisplayName("[실패] : 상품주문 상세정보 조회 - assert Fail")
+    void getOrderDetailFail() throws Exception {
+        //when,then
+        Assertions.assertThrows(AssertionError.class, () -> orderController.getOrderDetail(new OrderViewDto()));
+        Assertions.assertThrows(AssertionError.class, () -> orderController.getOrderDetail(OrderViewDto.builder().id(1L).build()));
+        Assertions.assertThrows(AssertionError.class, () -> orderController.getOrderDetail(OrderViewDto.builder().id(1L).clientName("").build()));
+        Assertions.assertThrows(AssertionError.class, () -> orderController.getOrderDetail(OrderViewDto.builder().id(1L).clientName("han").build()));
+
+    }
+
+    @Test
+    @DisplayName("[실패] : 상품주문 Controller")
+    void registerOrderFail() throws Exception {
+        Assertions.assertThrows(AssertionError.class, () -> orderController.registerOrder(null));
     }
 
     @Test

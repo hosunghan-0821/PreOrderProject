@@ -169,11 +169,58 @@ jacocoTestReport {
                             '**/infra/**',
                             '**/scheduler/**',
                             '**/*Config',
-                            '**/global/**'
+                            '**/global/**',
+                            '**/facade/**'
                             // ...
                     ])
                 })
         )
     }
     finalizedBy 'jacocoTestCoverageVerification'
+}
+
+
+//커버리지 체크
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            // 룰을 간단히 켜고 끌 수 있다.
+            enabled = true
+
+            // 룰을 체크할 단위는 클래스 단위
+            element = 'CLASS'
+
+            // 브랜치 커버리지를 최소한 80% 만족시켜야 한다.
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.7
+            }
+
+            // 라인 커버리지를 최소한 80% 만족시켜야 한다.
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.7
+            }
+
+
+            // 커버리지 체크를 제외할 패키지  또는 클래스
+            excludes = [
+                    '*.test.*',
+                    '*.*Application',
+                    '*.*Config',
+                    '*.file.*',
+                    '*.infra.*',
+                    '*.*Runner',
+                    '*.global.*',
+                    '*.dto.*',
+                    '*.facade.*',
+                    '*.domain.*',
+                    '*.Cache*',
+                    '*.scheduler.*'
+            ]
+
+        }
+    }
 }

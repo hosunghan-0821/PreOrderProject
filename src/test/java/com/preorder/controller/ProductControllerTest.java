@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -102,6 +103,12 @@ class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("[실패] : 상품등록 API 테스트")
+    void registerProductFailAssert() throws Exception {
+        assertThrows(AssertionError.class, () -> productController.registerProduct(null));
+    }
+
+    @Test
     @DisplayName("[실패] : 상품등록 API 테스트 - 유효성검사 실패")
     void registerProductFail() throws Exception {
         //given
@@ -143,7 +150,13 @@ class ProductControllerTest {
                 ).andDo(print());
         //then
         resultActions.andExpect(MockMvcResultMatchers.status().isOk());
-//        productController.bulkRegisterProduct()
+
+    }
+
+    @Test
+    @DisplayName("[실패] : 상품 다중등록 API 테스트")
+    void bulkRegisterProductFailAssert() throws Exception {
+        assertThrows(AssertionError.class, () -> productController.bulkRegisterProduct(null));
     }
 
     @Test
@@ -211,8 +224,15 @@ class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("[실패] : 상품 단일조회 API 테스트 - assert")
+    void getProductDetailFailAssert() throws Exception {
+        org.junit.jupiter.api.Assertions.assertThrows(AssertionError.class, () -> productController.getProductDetail(0L));
+        org.junit.jupiter.api.Assertions.assertThrows(AssertionError.class, () -> productController.getProductDetail(null));
+    }
+
+    @Test
     @DisplayName("[성공] : 상품 업데이트 API 테스트")
-    void updateProduct() throws Exception{
+    void updateProduct() throws Exception {
 
         //given
         ProductViewDto productViewDto = this.productViewDtoForUpdate();
@@ -229,6 +249,12 @@ class ProductControllerTest {
         //then
         resultActions
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+    }
+
+    @Test
+    @DisplayName("[실패] : 상품 업데이트 API 테스트 - assert Fail")
+    void updateProductFailAssert() throws Exception {
+        assertThrows(AssertionError.class, () -> productController.updateProduct(null));
     }
 
     @Test
