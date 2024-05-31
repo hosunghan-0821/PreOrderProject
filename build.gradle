@@ -76,6 +76,11 @@ dependencies {
     //ehcache & spring cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'net.sf.ehcache:ehcache:2.10.9.2'
+
+    //redis cache
+    implementation('org.springframework.boot:spring-boot-starter-data-redis')
+
+
     //mockito
     testImplementation 'org.mockito:mockito-core:4.8.0'
     testImplementation 'net.bytebuddy:byte-buddy:1.14.13'
@@ -93,6 +98,7 @@ dependencies {
 
         implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
     }
+
 
 }
 

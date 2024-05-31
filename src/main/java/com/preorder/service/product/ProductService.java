@@ -90,8 +90,6 @@ public class ProductService {
     public List<Product> getProductByIds(List<Long> ids) {
         assert (ids != null);
         List<Product> allByIds = productRepository.findAllById(ids);
-
-
         return allByIds;
 
     }

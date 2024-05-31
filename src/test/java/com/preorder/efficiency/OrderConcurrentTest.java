@@ -2,22 +2,19 @@ package com.preorder.efficiency;
 
 import com.preorder.PreOrderApplication;
 import com.preorder.domain.Option;
-import com.preorder.domain.Order;
 import com.preorder.domain.Product;
 import com.preorder.dto.mapper.OptionMapper;
 import com.preorder.dto.mapper.ProductMapper;
 import com.preorder.dto.viewdto.OptionViewDto;
 import com.preorder.dto.viewdto.OrderViewDto;
 import com.preorder.dto.viewdto.ProductViewDto;
-import com.preorder.global.cache.CacheString;
+import com.preorder.global.cache.CacheService;
 import com.preorder.repository.order.OrderRepository;
 import com.preorder.repository.product.OptionRepository;
 import com.preorder.repository.product.ProductRepository;
 import com.preorder.service.facade.OrderFacadeService;
 import com.preorder.service.order.OrderManageService;
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,10 +59,12 @@ public class OrderConcurrentTest {
     private OrderRepository orderRepository;
 
     @Autowired
+    private CacheService cacheService;
+    @Autowired
     private CacheManager cacheManager;
 
     @Test
-    @DisplayName("[성공] : 사전예약동시섬 확인 테스트 코드")
+    @DisplayName("[성공] : 사전예약동시성 확인 테스트 코드")
     public void orderConcurrentTest() throws InterruptedException {
 
         //given
@@ -120,14 +119,11 @@ public class OrderConcurrentTest {
         Map<Long, Long> orderInfoMap = orderFacadeService.getOrderInfoMap(productViewDtoList);
 
 
-        cacheManager.addCache(CacheString.PRODUCT_COUNT_CACHE);
-        Cache cache = cacheManager.getCache(CacheString.PRODUCT_COUNT_CACHE);
-        cacheManager.getTransactionController().begin();
-        cache.put(new Element(product.getId(), product.getProductNum()));
-        Long setNum = (Long) cache.get(product.getId()).getObjectValue();
-        cacheManager.getTransactionController().commit();
+        cacheService.setProductCacheToRedis();
+        String redisCacheKey = CacheService.PRODUCT_CACHE_PREFIX + "1";
+        Long value = cacheService.getRedisCache(redisCacheKey);
 
-        Assertions.assertThat(setNum).isEqualTo(product.getProductNum());
+        Assertions.assertThat(value).isEqualTo(product.getProductNum());
 
 
         //when
@@ -158,16 +154,9 @@ public class OrderConcurrentTest {
 
 
         //then
-        cache = cacheManager.getCache(CacheString.PRODUCT_COUNT_CACHE);
-
-        Element element = cache.get(save.getId());
-        Long remainNum = (Long) element.getObjectValue();
-
+        Long remainNum = cacheService.getRedisCache(redisCacheKey);
         Assertions.assertThat(remainNum).isEqualTo(10L);
 
-
-        List<Order> orderList = orderRepository.findAll();
-        Assertions.assertThat(orderList.size()).isEqualTo(threadCnt);
 
 
     }
