@@ -48,31 +48,47 @@ public class OrderManageService {
     private final CacheService cacheService;
 
     @Transactional
-    public void registerOrderWithLock(OrderViewDto orderViewDto, Map<Long, Long> orderMapInfo) {
+    public void registerOrderWithCache(OrderViewDto orderViewDto, Map<Long, Long> orderMapInfo) {
 
         List<Long> orderProductIdList = new ArrayList<>(orderMapInfo.keySet());
 
-
-        // ReidsCache singleThread atomic 보장 needNot Locking
-
         //1. redis에 cache 존재여부 확인
+        boolean isAllProductCache = true;
+        for (var key : orderMapInfo.keySet()) {
 
-
-        //존재하면 redisCache로직 태우고
-        boolean result = cacheService.decreaseProductNumByOrder(orderMapInfo);
-        if(!result) {
-            throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
+            Long redisCacheOrNull = cacheService.getRedisCacheOrNull(CacheService.PRODUCT_CACHE_PREFIX + key);
+            if (redisCacheOrNull == null) {
+                isAllProductCache = false;
+                break;
+            }
         }
+        //존재하면 redisCache로직 태우고 비관락 태워야함.
+        if(isAllProductCache){
+            // ReidsCache singleThread atomic 보장 need Not Locking
+            boolean result = cacheService.decreaseProductNumByOrder(orderMapInfo);
+            if (!result) {
+                throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
+            }
+        } else {
+            //없으면 기존 JPA 비관락 세팅..
+            List<Product> productList = productService.getProductByIdsWithLock(orderProductIdList);
+            for (var product : productList) {
+                Long orderNum = orderMapInfo.get(product.getId());
+                Long remainNum = product.getProductNum();
 
-        //없으면 기존 JPA 비관락 세팅..
-        List<Product> productList = productService.getProductByIds(orderProductIdList);
-
+                if (orderNum > remainNum) {
+                    throw new BusinessLogicException(ErrorCode.BUSINESS_LOGIC_EXCEPTION_REMAIN_PRODUCT_ERROR);
+                }
+                product.updateProductNum(orderNum);
+            }
+        }
 
         //주문기본 내용 저장
         OrderDto orderDto = orderMapper.changeTOoOrderDomainDto(orderViewDto);
         Order savedOrder = orderService.registerOrder(orderDto);
 
         //주문 상품정보 저장
+
         for (ProductViewDto productViewDto : orderViewDto.getProducts()) {
 
             ProductDto productDto = productMapper.changeToProductDomainDto(productViewDto);

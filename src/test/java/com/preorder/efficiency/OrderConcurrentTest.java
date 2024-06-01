@@ -121,7 +121,7 @@ public class OrderConcurrentTest {
 
         cacheService.setProductCacheToRedis();
         String redisCacheKey = CacheService.PRODUCT_CACHE_PREFIX + "1";
-        Long value = cacheService.getRedisCache(redisCacheKey);
+        Long value = cacheService.getRedisCacheOrNull(redisCacheKey);
 
         Assertions.assertThat(value).isEqualTo(product.getProductNum());
 
@@ -143,7 +143,7 @@ public class OrderConcurrentTest {
         for (int i = 0; i < threadCnt; i++) {
             executorService.execute(() -> {
                 try {
-                    orderManageService.registerOrderWithLock(orderViewDto, orderInfoMap);
+                    orderManageService.registerOrderWithCache(orderViewDto, orderInfoMap);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -154,7 +154,7 @@ public class OrderConcurrentTest {
 
 
         //then
-        Long remainNum = cacheService.getRedisCache(redisCacheKey);
+        Long remainNum = cacheService.getRedisCacheOrNull(redisCacheKey);
         Assertions.assertThat(remainNum).isEqualTo(10L);
 
 

@@ -70,8 +70,8 @@ public class OrderFacadeService {
         Map<Long, Long> orderInfoMap = getOrderInfoMap(orderViewDto.getProducts());
 
 
-        //DB락 얻은 상태에서 제고 개수 다시 비교 및 처리
-        orderManageService.registerOrderWithLock(orderViewDto,orderInfoMap);
+        //Cache를 활용하여 상품정리
+        orderManageService.registerOrderWithCache(orderViewDto,orderInfoMap);
 
         //After Commit EventListner로 처리..
 

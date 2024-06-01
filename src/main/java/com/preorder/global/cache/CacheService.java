@@ -65,12 +65,13 @@ public class CacheService {
         }
     }
 
-    public Long getRedisCache(String redisCacheKey) {
+    public Long getRedisCacheOrNull(String redisCacheKey) {
         Object object = redisTemplate.opsForValue().get(redisCacheKey);
         return (Long) object;
     }
 
-    public Set<String> getAllKey() {
+    public Set<String> getAllProductKey() {
+
         Set<String> keys = redisTemplate.keys(PRODUCT_CACHE_PREFIX + "*");
         return keys;
     }
@@ -89,7 +90,6 @@ public class CacheService {
         StringBuilder luaScriptDynamicStringBuilder = getLuaScriptDynamic(keyList);
 
 
-        String string = luaScriptDynamicStringBuilder.toString();
 
         RedisScript<Boolean> decrementLeftSeatRedisScript = new DefaultRedisScript<>(luaScriptDynamicStringBuilder.toString(), Boolean.class);
 

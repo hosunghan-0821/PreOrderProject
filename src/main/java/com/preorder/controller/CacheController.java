@@ -33,9 +33,9 @@ public class CacheController {
         }
         cacheService.getCacheManager().getTransactionController().commit();
 
-        Set<String> allKey = cacheService.getAllKey();
+        Set<String> allKey = cacheService.getAllProductKey();
         for(String key : allKey) {
-            Long value = cacheService.getRedisCache(key);
+            Long value = cacheService.getRedisCacheOrNull(key);
             System.out.println(value);
         }
     }
