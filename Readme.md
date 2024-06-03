@@ -55,8 +55,9 @@
      - 추후에 scale out을 하더라도, ehcache에서 지원해주는 분산캐시 (Terracotta Server)를 통해서 캐시 동기화를 할 수 있을 것으로 판단하였습니다.<br><br>
 3. 비관락 적용된 사전 예약 API - TPS & Response Time 개선 
    ### 개선안 1 : @Transactional 적용 범위 줄이기 + DB Hikari Connection Pool 증가
-     - 기존의 @Transcational 코드에는 사전예약 후 사전예약 정보 insert 로직 + Notification 로직이 있었습니다. 이를 분리해서 @Transactional의 범위를 줄이고 테스트 하였습니다.<br><br>
-     
+     - 기존의 @Transcational 코드에는 사전예약 후 사전예약 정보 insert 로직 + Notification 로직이 있었습니다. 이를 분리해서 @Transactional의 범위를 줄이고 테스트 하였습니다.
+     - TPS는 기존의 비관락을 했을 때와 큰 차이가 없었습니다. (병목 이슈를 제대로 짚지 못했다고 판단하였습니다.)<br><br>
+   
      - 성능 내용 <br>
        - **@Transactional 적용 범위 줄이기**
          ![image](https://github.com/hosunghan-0821/monitoring_java/assets/79980357/5d91f1aa-eb14-40b0-93a6-4a895b2633d0)
@@ -72,6 +73,7 @@
      
      - 개선안 1의 문제점을 분석하였을 때, DB Lock이 걸린 상태에서 (예약정보 Insert + DB Lock 대기) 비용이 크다는 것을 파악하였습니다. 
      - 이를 해결하기 위해, Ehcache에 DB Product 정보를 미리 Load시키고, 사전 예약 처리 후, 주기적으로 상품 개수의 변경점을 Write Back하는 방식을 채택하여 테스트 하였습니다.
+     - TPS는 평균 300이 나왔습니다.
 
      <br><br>
      - 성능 내용 <br><br>
@@ -81,8 +83,11 @@
        - 다만, Ehcache에 여러 상품에 대해서 Lock 걸을 때에도, Race Condition이 작동해, DeadLock을 유발할 수 있는 문제점과 Applicaion이 갑자기 떨어지게 된다면, 그에 따른 남은 상품개수 정합성에 대한 문제점이 있었습니다.
        <br><br>
 
-   ### 개선안 3 : Redis 도입과 Write Back 방식
-     - global cache이면서, single thread로 동작하는 redis 기술을 도입하여, 작업의 원자성을 유지하도록 하여서 불필요한 락을 최소화하였습니다. 
+   ### 개선안 3 : Redis 도입과 Lua Script를 활용하여 원자성을 지키면서, 요청을 처리하도록 하였습니다. ehcache와 마찬가지로 Write Back 방식을 사용하였습니다.
+     - global cache이면서, single thread로 동작하는 redis 라는 기술을 도입하여, 작업의 원자성을 유지하도록 하여서 불필요한 락을 최소화하였습니다.
+     - TPS 는 평균 300정도 나왔고 주기적으로 반응속도가 증가한 부분을 파악했을 때, 주문을 위한 여러 insert 쿼리가 나가는 상황에서 connection pool의 개수가 부족한걸로 판단하였습니다. 
      - 성능 내용 <br><br>
-  
-
+       ![캡처](https://github.com/hosunghan-0821/PreOrderProject/assets/79980357/1b78d124-7a7d-4cb6-a78d-7ce07d47f6b5)
+       ![analyze](https://github.com/hosunghan-0821/PreOrderProject/assets/79980357/fb4d1f46-48b2-4040-90ce-e7d42965ab12)
+         - 안정적인 TPS 와 주기적으로 response time이 튀는 부분은 있었지만 안정적으로 반응시간이 나왔습니다.
+         - redis를 운영에 사용한다면, ehcache의 문제점과 같이, 예기치 않은 상황에 떨어졌을 때, 대응하는 점을 고민하는것이 필요해 보입니다.
